@@ -1,0 +1,2202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fall 2026 — Command Center</title>
+<style>
+:root{
+  --ink:#12100c;
+  --ink-2:#4a453b;
+  --ink-3:#857e70;
+  --paper:#f7f4ec;
+  --card:#fffdf8;
+  --gold:#cfb991;
+  --gold-deep:#8e7c4e;
+  --rule:#e3ddcd;
+  --rule-strong:#c9c1ab;
+  --red:#a3341f;
+  --green:#3f6b45;
+  --shadow:0 1px 0 rgba(18,16,12,.05), 0 8px 24px -18px rgba(18,16,12,.5);
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button,select,textarea,input{font:inherit;color:inherit}
+a{color:var(--gold-deep)}
+
+/* ---------- masthead ---------- */
+.masthead{
+  background:var(--ink);
+  color:var(--paper);
+  border-bottom:3px solid var(--gold);
+  position:sticky;top:0;z-index:50;
+}
+.masthead-in{max-width:1240px;margin:0 auto;padding:14px 20px 0;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.wordmark{font-family:var(--serif);font-size:22px;letter-spacing:.02em;font-weight:600;margin:0;line-height:1.1}
+.wordmark span{color:var(--gold)}
+.semester{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#a9a294;margin:2px 0 0}
+.masthead-meta{margin-left:auto;text-align:right;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:#a9a294;padding-bottom:4px}
+.masthead-meta b{color:var(--gold);font-weight:600}
+.pagenav{max-width:1240px;margin:0 auto;padding:10px 20px 0;display:flex;gap:2px}
+.pagenav button{
+  background:transparent;border:0;border-bottom:3px solid transparent;
+  color:#a9a294;padding:9px 16px;margin-bottom:-3px;cursor:pointer;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+}
+.pagenav button:hover{color:var(--paper)}
+.pagenav button[aria-selected="true"]{color:var(--ink);background:var(--gold);border-bottom-color:var(--gold)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1240px;margin:0 auto;padding:24px 20px 80px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin:0 0 6px}
+h2.section{font-family:var(--serif);font-size:26px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em}
+.section-note{color:var(--ink-2);margin:0 0 16px;font-size:14px;max-width:62ch}
+.block{margin-bottom:38px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:3px;box-shadow:var(--shadow)}
+
+/* ---------- weekly grid ---------- */
+.gridscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.weekgrid{min-width:760px;background:var(--card);border:1px solid var(--rule-strong);border-radius:3px;overflow:hidden}
+.wg-head{display:grid;grid-template-columns:64px repeat(5,1fr);background:var(--ink);color:var(--paper)}
+.wg-head div{padding:9px 8px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;text-align:center}
+.wg-head div.today{background:var(--gold);color:var(--ink)}
+.wg-body{display:grid;grid-template-columns:64px repeat(5,1fr);position:relative}
+.wg-times{position:relative}
+.wg-times .hr{height:56px;border-bottom:1px solid var(--rule);position:relative}
+.wg-times .hr span{position:absolute;top:-7px;right:7px;font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+.wg-col{position:relative;border-left:1px solid var(--rule)}
+.wg-col .hr{height:56px;border-bottom:1px solid var(--rule)}
+.wg-col.today{background:rgba(207,185,145,.13)}
+.evt{
+  position:absolute;left:3px;right:3px;border-radius:3px;padding:5px 7px;overflow:hidden;
+  border-left:3px solid var(--c,#999);background:var(--tint,#eee);
+}
+.evt b{display:block;font-size:12px;font-weight:700;line-height:1.25}
+.evt em{display:block;font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.03em;color:var(--ink-2);line-height:1.35}
+.nowline{position:absolute;left:64px;right:0;height:0;border-top:2px solid var(--red);z-index:5;pointer-events:none}
+.nowline::before{content:"";position:absolute;left:-5px;top:-5px;width:8px;height:8px;border-radius:50%;background:var(--red)}
+.nowline::after{content:"NOW";position:absolute;right:4px;top:-14px;font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--red)}
+
+/* ---------- course cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px}
+.ccard{padding:14px 15px;border-left:4px solid var(--c)}
+.ccard h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.01em}
+.ccard .code{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase}
+.ccard dl{margin:10px 0 0;display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:12.5px}
+.ccard dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding-top:3px}
+.ccard dd{margin:0;color:var(--ink-2)}
+
+/* ---------- generic table ---------- */
+table.data{width:100%;border-collapse:collapse;font-size:13.5px}
+table.data th{
+  text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;padding:8px 10px;border-bottom:1px solid var(--rule-strong);white-space:nowrap;
+}
+table.data td{padding:9px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+table.data tr:last-child td{border-bottom:0}
+.tablewrap{overflow-x:auto}
+
+/* ---------- assignment rows ---------- */
+.arow.done{opacity:.5}
+.arow.overdue .duecell b{color:var(--red)}
+.atitle{font-weight:600;line-height:1.3}
+.ameta{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ink-3);text-transform:uppercase;margin-top:2px}
+.duecell b{display:block;font-size:13px;white-space:nowrap}
+.duecell span{font-family:var(--mono);font-size:10px;color:var(--ink-3);white-space:nowrap}
+select.status,select.prio{
+  border:1px solid var(--rule-strong);background:var(--paper);border-radius:2px;padding:4px 6px;font-size:12px;cursor:pointer;
+}
+select.status[data-v="Done"]{background:#e4eee2;border-color:#a9c4a5;color:var(--green)}
+select.status[data-v="In Progress"]{background:#fbf0d8;border-color:var(--gold);color:var(--gold-deep)}
+select.prio[data-v="High"]{color:var(--red);border-color:#d8a99c}
+textarea.notes{
+  width:100%;min-width:150px;border:1px solid var(--rule);background:var(--paper);border-radius:2px;
+  padding:5px 7px;font-size:12.5px;resize:vertical;min-height:32px;font-family:var(--sans);
+}
+textarea.notes:focus,select:focus,button:focus-visible,input:focus{outline:2px solid var(--gold-deep);outline-offset:1px}
+.tagpill{
+  display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 6px;border-radius:2px;border:1px solid var(--rule-strong);color:var(--ink-2);white-space:nowrap;
+}
+.tagpill.exam{background:#f4dcd6;border-color:#d8a99c;color:var(--red)}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--rule-strong);padding-bottom:0}
+.tabs button{
+  background:transparent;border:1px solid transparent;border-bottom:0;border-radius:3px 3px 0 0;
+  padding:8px 13px;cursor:pointer;font-size:12.5px;color:var(--ink-2);margin-bottom:-1px;
+}
+.tabs button:hover{background:rgba(207,185,145,.2)}
+.tabs button[aria-selected="true"]{background:var(--card);border-color:var(--rule-strong);color:var(--ink);font-weight:700}
+.tabs button .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.tabs button .cnt{font-family:var(--mono);font-size:10px;color:var(--ink-3);margin-left:6px}
+
+/* ---------- overview ---------- */
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.stat{padding:12px 14px}
+.stat b{display:block;font-family:var(--serif);font-size:30px;line-height:1;font-weight:600}
+.stat span{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.stat.alarm b{color:var(--red)}
+.daygroup{margin-bottom:18px}
+.dayhead{
+  display:flex;align-items:baseline;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:4px;margin-bottom:0;
+}
+.dayhead h4{margin:0;font-family:var(--serif);font-size:17px;font-weight:600}
+.dayhead .rel{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-left:auto}
+.dayhead.is-today{border-bottom-color:var(--red)}
+.dayhead.is-today .rel{color:var(--red)}
+.progrow{display:grid;grid-template-columns:130px 1fr 54px;gap:10px;align-items:center;padding:6px 0;font-size:12.5px}
+.bar{height:7px;background:var(--rule);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--c,var(--gold-deep))}
+.progrow .pct{font-family:var(--mono);font-size:11px;color:var(--ink-3);text-align:right}
+
+/* ---------- calendar ---------- */
+.calbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.btn{
+  border:1px solid var(--rule-strong);background:var(--card);border-radius:2px;padding:6px 12px;cursor:pointer;font-size:12.5px;
+}
+.btn:hover{background:var(--gold);border-color:var(--gold)}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.calbar .title{font-family:var(--serif);font-size:19px;font-weight:600;margin:0 4px}
+.month{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--rule-strong);border-radius:3px;overflow:hidden;background:var(--card)}
+.month .dow{background:var(--ink);color:#a9a294;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:6px 8px;text-align:center}
+.mcell{min-height:104px;border-top:1px solid var(--rule);border-left:1px solid var(--rule);padding:5px 6px}
+.mcell:nth-child(7n+1){border-left:0}
+.mcell.out{background:rgba(227,221,205,.32)}
+.mcell.today{background:rgba(207,185,145,.24);box-shadow:inset 0 0 0 2px var(--gold)}
+.mcell .dnum{font-family:var(--mono);font-size:11px;color:var(--ink-3);display:block;margin-bottom:3px}
+.mcell.today .dnum{color:var(--ink);font-weight:700}
+.chip{
+  display:block;font-size:10.5px;line-height:1.25;padding:2px 4px;border-radius:2px;margin-bottom:2px;
+  border-left:3px solid var(--c);background:var(--tint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:default;
+}
+.chip.done{text-decoration:line-through;opacity:.55}
+.more{font-family:var(--mono);font-size:9.5px;color:var(--ink-3)}
+.holiday{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--gold-deep);background:rgba(207,185,145,.3);padding:2px 4px;border-radius:2px;margin-bottom:2px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mcell.holiday-cell{background:repeating-linear-gradient(45deg,transparent,transparent 7px,rgba(207,185,145,.16) 7px,rgba(207,185,145,.16) 14px)}
+.miles{list-style:none;margin:0;padding:0}
+.miles li{display:flex;gap:14px;padding:8px 0;border-bottom:1px solid var(--rule);font-size:13.5px}
+.miles li:last-child{border-bottom:0}
+.miles .dt{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--gold-deep);flex:0 0 76px;padding-top:2px}
+.daylist .empty{color:var(--ink-3);font-size:13px;padding:14px 0}
+
+/* ---------- campus ---------- */
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.legend div{display:flex;gap:9px;font-size:13px;padding:8px 10px;border:1px solid var(--rule);border-radius:3px;background:var(--card)}
+.legend code{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--gold-deep);flex:0 0 44px}
+.hops{list-style:none;margin:0;padding:0}
+.hops li{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:13.5px;align-items:baseline}
+.hops li:last-child{border-bottom:0}
+.hops .when{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);flex:0 0 74px}
+.hops .gap{margin-left:auto;font-family:var(--mono);font-size:11px;white-space:nowrap}
+.hops .gap.tight{color:var(--red);font-weight:700}
+.drop{
+  border:2px dashed var(--rule-strong);border-radius:3px;padding:26px 18px;text-align:center;background:var(--card);
+}
+.drop p{margin:0 0 10px;color:var(--ink-2);font-size:13.5px}
+.drop.over{border-color:var(--gold-deep);background:#fbf6e9}
+#mapImg{max-width:100%;border:1px solid var(--rule-strong);border-radius:3px;display:block}
+.savenote{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:8px}
+
+/* ---------- misc ---------- */
+.callout{border-left:3px solid var(--gold-deep);background:#fbf6e9;padding:10px 14px;font-size:13px;border-radius:0 3px 3px 0;margin:0 0 16px}
+.callout b{font-weight:700}
+.policy{margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)}
+.policy li{margin-bottom:5px}
+.emptystate{padding:26px 18px;text-align:center;color:var(--ink-2);font-size:13.5px}
+.addbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.addbar input[type="text"]{flex:1 1 200px;border:1px solid var(--rule-strong);background:var(--card);border-radius:2px;padding:6px 9px}
+.addbar input[type="date"]{border:1px solid var(--rule-strong);background:var(--card);border-radius:2px;padding:6px 9px}
+.toast{
+  position:fixed;left:50%;bottom:22px;transform:translate(-50%,14px);background:var(--ink);color:var(--paper);
+  padding:8px 16px;border-radius:99px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:99;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toolbar{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px;
+  padding:10px 12px;background:var(--card);border:1px solid var(--rule);border-radius:3px;
+}
+.toolbar input[type="search"]{
+  flex:1 1 180px;min-width:150px;border:1px solid var(--rule-strong);background:var(--paper);
+  border-radius:2px;padding:6px 10px;font-size:13px;
+}
+.toolbar select{border:1px solid var(--rule-strong);background:var(--paper);border-radius:2px;padding:6px 8px;font-size:12.5px}
+.toolbar .chk{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2);white-space:nowrap;cursor:pointer}
+.fcount{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-left:auto}
+.filtered{box-shadow:inset 0 0 0 2px var(--gold)}
+@media print{
+  .masthead,.toolbar,.tabs,.calbar,.addbar,.drop,.toast{display:none!important}
+  body{background:#fff}
+  .card{box-shadow:none}
+  textarea.notes{border:0;background:transparent;resize:none}
+  select{border:0;background:transparent;appearance:none}
+  .wrap{padding:0;max-width:none}
+  #page-command[hidden],#page-tracker[hidden]{display:none}
+  table.data{font-size:11px}
+  .daygroup,.mcell,tr{break-inside:avoid}
+}
+.urg{
+  display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.09em;text-transform:uppercase;
+  padding:2px 5px;border-radius:2px;margin-top:4px;white-space:nowrap;font-weight:700;
+}
+.urg.overdue{background:var(--red);color:#fff}
+.urg.today{background:#e0562f;color:#fff}
+.urg.tomorrow{background:#dd8a1a;color:#fff}
+.urg.soon{background:#f0c862;color:#3a2f10}
+.urg.week{background:#e6dfc9;color:#5a5340}
+.urg.two,.urg.later{background:transparent;color:var(--ink-3);border:1px solid var(--rule-strong);font-weight:500}
+.urg.done{background:#dbe8d9;color:var(--green)}
+.urg.none{background:transparent;color:var(--ink-3);border:1px dashed var(--rule-strong);font-weight:500}
+tr.arow.crit td{background:rgba(224,86,47,.06)}
+
+.urgstrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:8px;margin-bottom:18px}
+.ubox{padding:10px 12px;border-radius:3px;border:1px solid var(--rule);background:var(--card);text-align:left}
+.ubox b{display:block;font-family:var(--serif);font-size:26px;line-height:1.05}
+.ubox span{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.ubox.l0{border-color:var(--red);background:#fbeae6}.ubox.l0 b{color:var(--red)}
+.ubox.l1{border-color:#e0562f;background:#fdefe9}.ubox.l1 b{color:#c9491f}
+.ubox.l2{border-color:var(--gold);background:#fdf6e6}
+
+.examgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.examcard{padding:15px 16px;border-left:5px solid var(--c);position:relative}
+.examcard .when{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.examcard h4{margin:3px 0 2px;font-size:16px;font-weight:700}
+.examcard .big{font-family:var(--serif);font-size:23px;font-weight:600;line-height:1.1;margin:6px 0 2px}
+.examcard .cover{font-size:12.5px;color:var(--ink-2);margin:8px 0 0;line-height:1.4}
+.examcard .ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;padding-top:11px;border-top:1px solid var(--rule)}
+input.score{
+  width:96px;border:1px solid var(--rule-strong);background:var(--paper);border-radius:2px;padding:4px 7px;font-size:12px;
+}
+input.score:not(:placeholder-shown){background:#e4eee2;border-color:#a9c4a5;font-weight:700}
+.gradeblock{margin-bottom:26px;padding:15px 17px;border-left:5px solid var(--c)}
+.gradeblock h3{margin:0 0 2px;font-size:16px;font-weight:700}
+.gradeblock .sub{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin-bottom:12px}
+.gradeblock table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px}
+.gradeblock td{padding:5px 0;border-bottom:1px solid var(--rule)}
+.gradeblock td:last-child{text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--ink-2);white-space:nowrap;padding-left:12px}
+.gradeblock tr:last-child td{border-bottom:0;font-weight:700}
+.pbox{margin-top:12px;font-size:13px;line-height:1.5}
+.pbox h5{margin:0 0 3px;font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--gold-deep)}
+.pbox p{margin:0 0 10px;color:var(--ink-2)}
+.icsbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+
+/* ---------- daily command center ---------- */
+.hero{margin-bottom:26px}
+.hero .date{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.hero h2{font-family:var(--serif);font-size:32px;font-weight:600;margin:4px 0 0;letter-spacing:-.015em}
+.hero .sum{color:var(--ink-2);margin:6px 0 0;font-size:14px}
+.today2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media (max-width:820px){.today2{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--rule);border-radius:4px;box-shadow:var(--shadow);overflow:hidden}
+.panel > header{
+  display:flex;align-items:baseline;gap:8px;padding:11px 15px;border-bottom:1px solid var(--rule);background:var(--ink);
+}
+.panel > header h3{margin:0;font-size:12px;font-family:var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.panel > header .n{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:#a9a294;letter-spacing:.08em}
+.panel .body{padding:5px 15px}
+.panel .foot{padding:9px 15px;border-top:1px solid var(--rule);background:rgba(227,221,205,.28);font-size:12px;color:var(--ink-2)}
+
+.cls{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--rule);align-items:flex-start}
+.cls:last-child{border-bottom:0}
+.cls .tm{flex:0 0 74px;font-family:var(--mono);font-size:11px;line-height:1.45;color:var(--ink-2)}
+.cls .tm b{display:block;font-size:13px;color:var(--ink)}
+.cls .bd{flex:1;min-width:0}
+.cls .bd b{display:block;font-size:14px;font-weight:700;line-height:1.25}
+.cls .bd span{font-size:12px;color:var(--ink-2)}
+.cls .rail{flex:0 0 4px;align-self:stretch;border-radius:99px;background:var(--c);min-height:34px}
+.cls.now{background:rgba(207,185,145,.2);margin:0 -15px;padding:11px 15px}
+.cls.past{opacity:.45}
+.stateflag{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 5px;border-radius:2px;font-weight:700}
+.stateflag.live{background:var(--red);color:#fff}
+.stateflag.next{background:var(--gold);color:var(--ink)}
+
+.due{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--rule);align-items:flex-start}
+.due:last-child{border-bottom:0}
+.due .rail{flex:0 0 4px;align-self:stretch;border-radius:99px;background:var(--c);min-height:34px}
+.due .bd{flex:1;min-width:0}
+.due .bd b{display:block;font-size:13.5px;font-weight:600;line-height:1.3}
+.due .bd .m{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-top:2px}
+.due select.status{margin-top:6px}
+.clear{padding:22px 0 26px;text-align:center;color:var(--ink-3);font-size:13.5px}
+.clear b{display:block;font-family:var(--serif);font-size:19px;color:var(--ink-2);font-weight:600;margin-bottom:3px}
+
+.qlinks{display:flex;flex-wrap:wrap;gap:8px}
+.ql{
+  display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:3px;text-decoration:none;
+  border:1px solid var(--rule-strong);background:var(--card);color:var(--ink);font-size:13px;cursor:pointer;
+}
+.ql:hover{background:var(--gold);border-color:var(--gold)}
+.ql i{width:7px;height:7px;border-radius:50%;background:var(--c,var(--gold-deep));display:inline-block;font-style:normal}
+.ql.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.ql.primary:hover{background:var(--gold-deep);border-color:var(--gold-deep);color:#fff}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:12px}
+.tile{
+  text-align:left;padding:14px 15px;border:1px solid var(--rule);background:var(--card);border-radius:4px;
+  cursor:pointer;box-shadow:var(--shadow);border-top:3px solid var(--c,var(--gold));
+}
+.tile:hover{border-color:var(--rule-strong);transform:translateY(-1px)}
+.tile b{display:block;font-size:14px;font-weight:700;margin-bottom:3px}
+.tile span{display:block;font-size:12px;color:var(--ink-2);line-height:1.4}
+.tile .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:7px;display:block}
+
+details.fold{border:1px solid var(--rule);border-radius:4px;background:var(--card);margin-bottom:12px;box-shadow:var(--shadow)}
+details.fold > summary{
+  padding:13px 16px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;
+  font-size:14px;font-weight:600;
+}
+details.fold > summary::-webkit-details-marker{display:none}
+details.fold > summary::before{content:"+";font-family:var(--mono);color:var(--gold-deep);font-size:15px;font-weight:700;width:12px}
+details.fold[open] > summary::before{content:"\2212"}
+details.fold > summary span{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);font-weight:400}
+details.fold > summary:hover{background:rgba(207,185,145,.14)}
+details.fold .inner{padding:4px 16px 18px;border-top:1px solid var(--rule)}
+.statuspill{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.09em;text-transform:uppercase;padding:2px 6px;border-radius:2px;font-weight:700;white-space:nowrap}
+.statuspill.done{background:#dbe8d9;color:var(--green)}
+.statuspill.inprogress{background:#fbf0d8;color:var(--gold-deep)}
+.statuspill.todo{background:transparent;color:var(--ink-3);border:1px dashed var(--rule-strong);font-weight:500}
+.statuspill.note{background:#f4dcd6;color:var(--red)}
+.cmpgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px}
+.cmpcard{padding:16px 17px;border-left:5px solid var(--c)}
+.cmpcard h3{margin:0 0 4px;font-size:16px;font-weight:700}
+.cmpcard .big{font-family:var(--serif);font-size:26px;font-weight:600;margin:8px 0 2px}
+.cmpcard .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.cmpcard dl{margin:12px 0 0;font-size:13px}
+.cmpcard dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin-top:8px}
+.cmpcard dd{margin:2px 0 0;color:var(--ink-2)}
+.reqrow{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);align-items:flex-start}
+.reqrow:last-child{border-bottom:0}
+.reqrow .rc{flex:0 0 150px;font-family:var(--mono);font-size:11.5px;color:var(--ink-2)}
+.reqrow .rt{flex:1;min-width:0}
+.reqrow .rt b{display:block;font-size:13.5px;font-weight:600}
+.reqrow .rt p{margin:3px 0 0;font-size:12px;color:var(--ink-2);max-width:60ch}
+.reqrow .prog{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.plancourse{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--rule);font-size:13px}
+.plancourse:last-child{border-bottom:0}
+.plancourse .pc{font-family:var(--mono);font-size:11.5px;color:var(--gold-deep);flex:0 0 150px}
+.plancourse .pt{flex:1;min-width:0}
+.plancourse .pt b{display:block;font-weight:600}
+.plancourse .pt span{color:var(--ink-2);font-size:12px}
+.plancourse .pcr{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:0 0 40px;text-align:right}
+.planterm{margin-bottom:16px;padding:14px 16px}
+.planterm h4{margin:0 0 2px;font-family:var(--serif);font-size:16px;font-weight:600}
+.planterm .credittag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.footer{border-top:1px solid var(--rule-strong);margin-top:40px;padding-top:14px;font-size:12px;color:var(--ink-3)}
+@media (max-width:640px){
+  .wrap{padding:18px 14px 70px}
+  h2.section{font-size:22px}
+  .mcell{min-height:74px}
+  .masthead-meta{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <div>
+      <h1 class="wordmark">Fall 2026 <span>/</span> Command Center</h1>
+      <p class="semester">Purdue West Lafayette · Aug 24 – Dec 11</p>
+    </div>
+    <div class="masthead-meta">Today <b id="todayStamp">—</b></div>
+  </div>
+  <nav class="pagenav" role="tablist" aria-label="Pages">
+    <button role="tab" id="nav-command" aria-selected="true">Command Center</button>
+    <button role="tab" id="nav-tracker" aria-selected="false">Assignment Tracker</button>
+    <button role="tab" id="nav-transfer" aria-selected="false">Transfer Plan</button>
+  </nav>
+</header>
+
+<main class="wrap" id="page-command"></main>
+
+<main class="wrap" id="page-tracker" hidden>
+  <div class="toolbar">
+    <input type="search" id="fq" placeholder="Search assignments…" aria-label="Search assignments">
+    <select id="ftype" aria-label="Filter by type"><option>All types</option></select>
+    <select id="fstat" aria-label="Filter by status">
+      <option>Any status</option><option>Not Started</option><option>In Progress</option><option>Done</option>
+    </select>
+    <label class="chk"><input type="checkbox" id="fhide"> Hide completed</label>
+    <span id="fcount" class="fcount"></span>
+    <button class="btn" id="fclear" hidden>Clear</button>
+    <button class="btn" id="icsBtn">Add to Calendar</button>
+    <button class="btn" id="printBtn">Print</button>
+  </div>
+  <div class="tabs" id="trackerTabs" role="tablist" aria-label="Tracker views"></div>
+  <div id="trackerBody"></div>
+</main>
+
+<main class="wrap" id="page-transfer" hidden></main>
+
+<div class="toast" id="toast">Saved</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   1. COURSES — from the schedule grid + the syllabi you sent
+   ============================================================ */
+const COURSES = [
+  { id:"ma165", code:"MA 16500", name:"Analytic Geometry & Calculus I", short:"Calculus",
+    c:"#2563eb", tint:"#dbeafe",
+    instructor:"Kenji Matsuki", email:"matsuki@purdue.edu",
+    hours:"MWF 2:30–3:20 PM · UNIV 207", credits:"4 cr",
+    meets:"Lecture MWF 1:30–2:20 · CL50 224 — Recitation R 8:30–9:20 · SCHM 309",
+    grading:[
+      ["Lecture attendance","30 pts"],["Homework (MyLab Math)","200 pts"],["Quizzes","100 pts"],
+      ["3 midterm exams","300 pts (100 each)"],["Final exam","200 pts"],["Total","830 pts"]
+    ],
+    policies:[
+      "33 MyLab Math assignments (two lowest dropped) and 11 quizzes (one lowest dropped).",
+      "Cut-offs: A+ 830–790 · A 789–750 · A− 749–720 · B+ 719–690 · B 689–660 · B− 659–630 · C+ 629–600 · C 599–570 · C− 569–540 · D+ 539–510 · D 509–480 · F ≤479. Cut-offs may be lowered, never raised.",
+      "Attendance is required at lecture and recitation. Lecture attendance checks run Aug 31 through Dec 2.",
+      "AI is allowed on homework and quizzes to support your learning — not to copy answers. No calculator and no AI on exams.",
+      "Past-due MyLab Math assignments count as zero at the end of the term even if your displayed score looks higher."
+    ]},
+  { id:"chm11510", code:"CHM 11510", name:"General Chemistry I (Lecture)", short:"Chem Lecture",
+    c:"#3f6b45", tint:"#d7ead8",
+    instructor:"Dr. Garth Simpson (1st half) · Dr. Jon Rienstra-Kiracofe (2nd half)",
+    email:"CHM11510LEC@purdue.edu — use this, not individual emails",
+    hours:"Posted in the Resources module on Brightspace", credits:"3 cr",
+    meets:"Lecture TR 9:30–10:20 · WTHR 200 — Recitation R 4:30–5:20 · BRWN 3102",
+    grading:[
+      ["Math Review","5 pts"],
+      ["Lecture participation (iClicker)","60 pts — best 20 at 3 pts"],
+      ["Homework (Achieve)","130 pts — best 13 of 14 at 10 pts"],
+      ["Pre-recitation quizzes","40 pts — best 8 of 9 at 5 pts"],
+      ["Recitation attendance","50 pts — best 10 at 5 pts"],
+      ["Recitation worksheet uploads","45 pts — best 9 of 10 at 5 pts"],
+      ["3 midterm exams","465 pts — 155 each"],
+      ["Final exam (comprehensive)","310 pts"],
+      ["Sub-total","1105 pts"],
+      ["Lowest exam dropped","−155 pts"],
+      ["Total","950 pts"],
+      ["Extra credit available","up to 14 pts"]
+    ],
+    policies:[
+      "Scale: A ≥93% · A− 90–93 · B+ 86–90 · B 83–86 · B− 80–83 · C+ 76–80 · C 73–76 · C− 70–73 · D+ 66–70 · D 63–66 · D− 60–63 · F below 60.",
+      "The exam drop is clever: your 310-point final is split into two equal 155-point scores, compared against Exams 1–3, and the lowest of those five is dropped. A strong final can erase a weak midterm.",
+      "Weekly rhythm — Achieve homework due Wednesdays 11:59 PM; pre-recitation quiz on Gradescope due the day before recitation 11:59 PM; worksheet PDF uploaded to Gradescope by 11:59 PM the day of recitation.",
+      "Achieve homework gives 5 attempts per question, with a 5% deduction per wrong try — think before you submit rather than guessing.",
+      "Attendance is iClicker-based: 3 pts per lecture, best 20 of 26 count, so 6 absences are already built in. You must attend in person on a phone or laptop — physical remotes aren't allowed.",
+      "Extra credit: 0.5 pt per lecture for answering the iClicker question correctly (max 10 pts), plus 4 pts for the Goal Setting and Reflection surveys.",
+      "Recitation attendance needs you there within the first 10 minutes. One grace late arrival per student. Recitation is cancelled in Weeks 8 and 14.",
+      "Exams are on paper, 155 pts, multiple choice, 60 minutes, roughly half conceptual and half calculation, and built from the posted Learning Objectives. Simple scientific calculator only — nothing that graphs, solves, or stores.",
+      "Exam conflicts: email Marybeth Miller or the Gen Chem office at least one calendar week before the exam date.",
+      "AI is allowed to generate practice problems, make quizlets, proofread, explore examples, and via the Achieve AI Tutor. It is NOT allowed for getting answers to graded work, and you may never upload lecture slides, quiz questions, or Achieve problems into any AI platform. Disclose AI use on worksheet submissions.",
+      "Missed a lecture? Nobody needs to be told — the 6 dropped lectures cover it, and recordings are on Boilercast/Kaltura.",
+      "Deadlines: Sep 4 last day to drop without a record · Nov 24 last day to drop with a W. Dropping CHM 11510 forces you to drop CHM 11520 too.",
+      "Course coordinator Marybeth Miller (mille201@purdue.edu, BRWN 1144D) keeps all grade records. Gen Chem office: BRWN 1144, genchem@purdue.edu."
+    ],
+    schedule:{ title:"Lecture schedule (TR section)", head:["Week of","#","Topic","Reading"], rows:[
+      ["Aug 24","1","Fundamentals 1 — units & problem solving","1.3, 1.4, 1.5"],
+      ["Aug 24","2","Fundamentals 2 — the atom, elements and ions","2.3–2.6"],
+      ["Aug 31","3","Fundamentals 3 — chemical formulas and the mole","2.7, 3.1"],
+      ["Aug 31","4","Fundamentals 4 — chemical equations and stoichiometry","3.3, 3.4"],
+      ["Sep 7","5","Fundamentals 5 — molarity and solution stoichiometry · Labor Day, no M/T lecture","4.1"],
+      ["Sep 14","6","Fundamentals 6 — chemical reaction types","4.2, 4.3"],
+      ["Sep 14","7","Thermochemistry 1","6.1–6.2"],
+      ["Sep 21","8","Thermochemistry 2 · EXAM 1 Thu Sep 24","6.3–6.4"],
+      ["Sep 21","9","Thermochemistry 3","6.5–6.6"],
+      ["Sep 28","10","Quantum theory & atomic structure 1","7.1–7.2"],
+      ["Sep 28","11","Quantum theory & atomic structure 2","7.2–7.3"],
+      ["Oct 5","12","Quantum theory & atomic structure 3","7.4"],
+      ["Oct 5","13","Electron configuration & chemical periodicity 1","8.1–8.2"],
+      ["Oct 12","14","Electron configuration & periodicity 2 · October Break M/T, no recitation","8.3–8.4"],
+      ["Oct 19","15","Models of chemical bonding 1 · EXAM 2 Wed Oct 21","9.1–9.2"],
+      ["Oct 19","16","Models of chemical bonding 2","9.3–9.6"],
+      ["Oct 26","17","Shapes of molecules 1 — Lewis structures, resonance, formal charge","10.1"],
+      ["Oct 26","18","Shapes of molecules 2 — VSEPR","10.2"],
+      ["Nov 2","19","Shapes of molecules 3 — molecular polarity, bond angles","10.3"],
+      ["Nov 2","20","Intermolecular forces","12.1"],
+      ["Nov 9","21","Physical states and phase changes","12.2, 12.3"],
+      ["Nov 9","22","Solid state — crystal structures","12.6"],
+      ["Nov 16","23","Intermolecular forces in solution; bio macromolecules · EXAM 3 Thu Nov 19","13.1, 15.6"],
+      ["Nov 16","24","Colligative properties of solutions","13.6"],
+      ["Nov 23","—","No lecture M/T · Thanksgiving Break W/Th/F · no recitation","—"],
+      ["Nov 30","25","Gases 1","Ch. 5"],
+      ["Nov 30","26","Gases 2","Ch. 5"],
+      ["Dec 7","27","Nuclear chemistry 1","24.1"],
+      ["Dec 7","28","Nuclear chemistry 2","24.5, 24.6, 24.7"],
+      ["Dec 14","—","Finals week — comprehensive final exam, date TBA","—"]
+    ]}},
+  { id:"chm11520", code:"CHM 11520", name:"General Chemistry I — Lab", short:"Chem Lab",
+    c:"#c98a1e", tint:"#fbe6bd",
+    instructor:"Goel (your lab section) · Dr. Jeanine Conklin (course)", email:"jaconkli@purdue.edu · chm11520help@purdue.edu",
+    hours:"Tuesdays 8:30–9:30 AM", credits:"1 cr",
+    meets:"Lab W 7:30–10:20 · CHAS 1038",
+    grading:[
+      ["Week 1 assignments","10 pts (not dropped)"],["Week 2 assignments","5 pts (not dropped)"],
+      ["Experiment procedures","40 pts — best 10 of 11 × 4"],["Prelab quizzes","160 pts — best 10 of 11 × 16"],
+      ["Lab reports","200 pts — best 10 of 11 × 20"],["Total","415 pts"]
+    ],
+    policies:[
+      "Letter grades out of 415: A 373.5+ · B 332–373.49 · C 290.5–331.99 · D 249–290.49 · F below 249, or failure to complete 4+ labs.",
+      "You must complete 9 of 11 labs. Completing 8 drops your final grade a full letter; 7 or fewer is a failing grade.",
+      "Prelab quiz and procedure are due 11:59 PM the day before lab; the report is due 11:59 PM the day of lab. Late reports are not accepted.",
+      "Miss the prelab quiz or procedure and you are not allowed to attend lab that week — which also costs you the 20-point report.",
+      "Online safety certification (20/25 minimum) is due Mon Sep 7, 11:59 PM. Without it you are sent home with a zero.",
+      "Goggles must be splash-proof and indirectly vented. Dress code: covered neck to ankles, closed-toe and closed-heel shoes, no leggings, no holes.",
+      "Arriving more than 10 minutes late, or leaving before submitting your report, is scored as a failure to complete.",
+      "No AI in this course — using it, or uploading course materials to any AI platform, is treated as academic dishonesty.",
+      "One free make-up lab per semester if you request it before your lab start time. Lowest prelab, procedure, and report scores are each dropped.",
+      "Deadlines: Sep 4 last day to drop without a record · Nov 24 last day to drop with a W. Miss check-out and it's a $45 fee."
+    ]},
+  { id:"acct200", code:"ACCT 20000", name:"Introduction to Accounting", short:"Accounting",
+    c:"#b4703c", tint:"#f7e2c9",
+    instructor:"Terra Maienbrook", email:"tmaienbr@purdue.edu",
+    hours:"Mon & Wed 8:30–9:30 AM, or by appointment (virtual available)", credits:"3 cr",
+    meets:"Section 004 (CRN 12041) · MWF 12:30–1:20 · FRNY G140",
+    grading:[
+      ["SmartBook Reviews via Connect","15% — lowest dropped"],
+      ["Homework via Connect","20% — lowest dropped"],
+      ["Participation (60 iClicker points)","5%"],
+      ["Exam 1 — 3 chapters","15%"],
+      ["Exam 2 — 4 chapters","20%"],
+      ["Exam 3 — 5 chapters, finals week","25%"],
+      ["Total","100%"]
+    ],
+    policies:[
+      "Scale: A 94–100 · A− 90–93 · B+ 87–89 · B 83–86 · B− 80–82 · C+ 77–79 · C 73–76 · C− 70–72 · D+ 67–69 · D 63–66 · D− 60–62 · F below 60. Final percentage is rounded to the nearest whole number.",
+      "Daniels School caps the grade distribution mean at 3.0, so she reserves the right to adjust the scale at the end of the term.",
+      "No late assignments and no individual extra credit — any extra credit is offered to everyone.",
+      "Raise grade concerns within 3 business days of a grade posting. She will not negotiate grades.",
+      "Connect homework gives unlimited attempts and unlimited \"Check My Work\" clicks, so full credit is achievable — budget the time.",
+      "SmartBook reviews have no penalty for wrong answers; just push the progress bar to completion.",
+      "AI is allowed in this course except on the three exams.",
+      "No attendance policy and no attendance taken — but 5% of your grade is 60 iClicker points. She asks more than 60 questions, so occasional absences are survivable. Track your count in Brightspace, not the iClicker app.",
+      "Make-up exams only for ODOS-excused absences or documented exam conflicts. She contacts students on the conflict report herself.",
+      "The final exam schedule isn't published until several weeks in — don't book winter travel until it is. No early finals.",
+      "TAs (Joseph Kallely · jkallely@purdue.edu, Wed 3:00–4:30 PM in KRAN 105B; Mason Lee · lee5462@purdue.edu) can help with material but cannot change grades or grant extensions.",
+      "Supplemental Instruction with Nyree Ruiz runs Tue & Thu 4:30–5:20 PM in SCHM 116 — heads up, Thursday's session overlaps your CHM 11510 recitation.",
+      "Piazza is the course Q&A board and is free; enroll from the Brightspace link if you registered late."
+    ]},
+  { id:"scla102", code:"SCLA 10200", name:"Critical Thinking & Communication II", short:"SCLA",
+    c:"#b5427a", tint:"#f9d6e6",
+    instructor:"Gwenael Jouin", email:"gjouin@purdue.edu",
+    hours:"TR 10:30–11:30 AM and 4:30–5:30 PM, or by appointment · BRNG 6140", credits:"3 cr",
+    meets:"Group 4 · TR 3:00–4:15 · PAO B157",
+    grading:[
+      ["Participation & discussion","20%"],["Presentation 1 — learn from effective orators","10%"],
+      ["Presentation 2 — turn an argument into a speech","10%"],["Presentation 3 — weigh pros and cons","10%"],
+      ["Presentation 4 — speech contest","30%"],["Argumentative essays (4)","5%"],
+      ["Text analyses (4)","5%"],["Final paper","10%"],["Extra credit available","up to 3%"]
+    ],
+    policies:[
+      "Theme: Capitalism and Humanity — Antagonism or Complementarity?",
+      "Device-free classroom. Phones, tablets and laptops are not permitted; using one gets you escorted out and marked absent.",
+      "Three sick days with no penalty. Every absence after that cuts 3% from your final grade; more than five can fail you.",
+      "Late is up to 15 minutes; after that you're marked absent, and two lates equal one absence.",
+      "Written work is done in class, so late papers and presentations are not accepted — only an ODOS-excused absence gets a reschedule.",
+      "Eight written assignment days: submit four argumentative essays and four text analyses across the semester. Alternating them is recommended.",
+      "Chatbot use is forbidden and is treated as plagiarism.",
+      "Email subject lines must read \"SCLA 102 + subject\", with a formal greeting and sign-off. Emails with only attachments get no reply.",
+      "Extra credit: attend Cornerstone events, submit a signed attendance form plus a 1–2 page essay. Maximum two submissions.",
+      "Honors (H-Ready) option adds a Passion Project Speech worth 100 points and shifts the weights slightly."
+    ]},
+  { id:"engl108", code:"ENGL 10800", name:"College Writing (First-Year Composition)", short:"English",
+    c:"#7c4ea8", tint:"#e7d9f5",
+    instructor:"Dr. Jessica Weatherford", email:"weatherj@purdue.edu",
+    hours:"W 1:00–3:00 PM via Zoom, and by appointment · Office SC 254", credits:"3 cr",
+    meets:"Section 120 (CRN 27355) · TR 12:00–1:15 · SCHM 227",
+    grading:[
+      ["Project 1 — textual analysis of a cultural object","25%"],
+      ["Project 2 — group multimedia film presentation","25%"],
+      ["Project 3 — essay or multimedia option","20%"],
+      ["Final Portfolio Project (ICaP common assignment)","5%"],
+      ["Informal Activities","25%"],
+      ["Total","100%"]
+    ],
+    policies:[
+      "Four units: Aug 24–Sep 22 (cultural objects) · Sep 22–Oct 29 (social issues) · Oct 29–Dec 3 (environment) · Dec 7–11 (portfolio).",
+      "The schedule overview is partial and tentative — detailed unit schedules come out as each new unit begins, sometimes with only oral notice in class.",
+      "Formal projects need a hard copy turned in during class AND an identical electronic copy on Brightspace. If they don't match, expect a grade deduction.",
+      "Informal activities include Brightspace quizzes, surprise pop/reading quizzes, peer review, workshops, Q/Cs and freewrites.",
+      "Readings come from The Norton Field Guide to Writing with Readings (7th ed.) unless marked \"Br\" for Brightspace.",
+      "If you miss class it's on you to find out what you missed — she recommends a reliable classmate or groupmate, especially for group work.",
+      "Theme: Rhetorics of Narrative — how stories drive communication across genres, images and visual texts.",
+      "Scale: A+ 97–100 · A 93–96 · A− 90–92 · B+ 87–89 · B 83–86 · B− 80–82 · C+ 77–79 · C 73–76 · C− 70–72 · D+ 67–69 · D 63–66 · D− 60–62 · F ≤59. Decimals round normally — .5 rounds up.",
+      "At least 6,000 words of polished writing: about 1,000–1,500 for Project 1, 3,000 for Project 2, 1,000 for Project 3, and 1,000 for the portfolio.",
+      "MLA formatting is required on all formal writing, and Purdue OWL functions as the course handbook.",
+      "Use a word processor that keeps version history — she recommends Google Docs — and save every draft. The portfolio depends on it.",
+      "Brightspace quizzes are usually due Fridays by 11:59 PM. Miss one and email within 24 hours for half credit — allowed once per student for the whole semester.",
+      "Projects 1 and 2 have default modes (P1 individual or partner, P2 collaborative). Switching needs her approval in advance.",
+      "Grades cannot be discussed over email due to FERPA — go in person or on Zoom.",
+      "Class time confirmed: TR 12:00–1:15 in SCHM 227 (Section 120). The generic ICaP PDF listing 1630 was for a different section.",
+      "Calendar mismatch worth checking: this syllabus lists Fall Break as Oct 13–14 and finals as Dec 15–20, while your other four syllabi say Oct 12–13 and Dec 14–19."
+    ]}
+];
+const C = Object.fromEntries(COURSES.map(c=>[c.id,c]));
+
+/* ---- weekly meeting blocks ---- */
+const MEETINGS = [
+  {c:"chm11520", d:3, s:"7:30", e:"10:20", label:"CHM 11520 Lab", room:"CHAS 1038"},
+  {c:"ma165",    d:4, s:"8:30", e:"9:20",  label:"MA 16500 Rec",  room:"SCHM 309"},
+  {c:"chm11510", d:2, s:"9:30", e:"10:20", label:"CHM 11510 Lec", room:"WTHR 200"},
+  {c:"chm11510", d:4, s:"9:30", e:"10:20", label:"CHM 11510 Lec", room:"WTHR 200"},
+  {c:"engl108",  d:2, s:"12:00",e:"13:15", label:"ENGL 10800",    room:"SCHM 227"},
+  {c:"engl108",  d:4, s:"12:00",e:"13:15", label:"ENGL 10800",    room:"SCHM 227"},
+  {c:"acct200",  d:1, s:"12:30",e:"13:20", label:"ACCT 20000",    room:"FRNY G140"},
+  {c:"acct200",  d:3, s:"12:30",e:"13:20", label:"ACCT 20000",    room:"FRNY G140"},
+  {c:"acct200",  d:5, s:"12:30",e:"13:20", label:"ACCT 20000",    room:"FRNY G140"},
+  {c:"ma165",    d:1, s:"13:30",e:"14:20", label:"MA 16500 Lec",  room:"CL50 224"},
+  {c:"ma165",    d:3, s:"13:30",e:"14:20", label:"MA 16500 Lec",  room:"CL50 224"},
+  {c:"ma165",    d:5, s:"13:30",e:"14:20", label:"MA 16500 Lec",  room:"CL50 224"},
+  {c:"scla102",  d:2, s:"15:00",e:"16:15", label:"SCLA 10200",    room:"PAO B157"},
+  {c:"scla102",  d:4, s:"15:00",e:"16:15", label:"SCLA 10200",    room:"PAO B157"},
+  {c:"chm11510", d:4, s:"16:30",e:"17:20", label:"CHM 11510 Rec", room:"BRWN 3102"}
+];
+
+const BUILDINGS = [
+  ["CL50","Class of 1950 Lecture Hall — MA 16500 lecture"],
+  ["SCHM","Schleman Hall — MA recitation (309), ENGL 10800 (227)"],
+  ["WTHR","Wetherill Lab of Chemistry — CHM 11510 lecture"],
+  ["BRWN","Brown Lab of Chemistry — CHM 11510 recitation"],
+  ["CHAS","Chaney-Hale Hall of Science — CHM 11520 lab"],
+  ["FRNY","Forney Hall of Chemical Engineering — ACCT 20000"],
+  ["PAO","Pao Hall of Visual & Performing Arts — SCLA 10200"],
+  ["UNIV","University Hall — Prof. Matsuki's office (207)"],
+  ["BRNG","Beering Hall — Prof. Jouin's office (6140)"]
+];
+const HOPS = [
+  ["Tue","CHM 11510 · WTHR 200 → ENGL 10800 · SCHM 227","1 hr 40 min",false],
+  ["Tue","ENGL 10800 · SCHM 227 → SCLA 10200 · PAO B157","1 hr 45 min",false],
+  ["Wed","CHM 11520 lab · CHAS 1038 → ACCT 20000 · FRNY G140","2 hr 10 min",false],
+  ["Wed","ACCT 20000 · FRNY G140 → MA 16500 · CL50 224","10 min",true],
+  ["Thu","MA recitation · SCHM 309 → CHM 11510 · WTHR 200","10 min",true],
+  ["Thu","CHM 11510 · WTHR 200 → ENGL 10800 · SCHM 227","1 hr 40 min",false],
+  ["Thu","SCLA 10200 · PAO B157 → CHM recitation · BRWN 3102","15 min — longest walk of the week",true],
+  ["Mon / Fri","ACCT 20000 · FRNY G140 → MA 16500 · CL50 224","10 min",true]
+];
+
+/* ---- no-class days and semester milestones ---- */
+const HOLIDAYS = {
+  "2026-09-07":"Labor Day — no classes",
+  "2026-09-25":"MA 16500 — no class",
+  "2026-10-12":"Fall Break — no classes",
+  "2026-10-13":"Fall Break — no classes",
+  "2026-10-23":"MA 16500 — no class",
+  "2026-11-20":"MA 16500 — no class",
+  "2026-11-23":"Thanksgiving week — no MA class",
+  "2026-11-25":"Thanksgiving Break — no classes",
+  "2026-11-26":"Thanksgiving Break — no classes",
+  "2026-11-27":"Thanksgiving Break — no classes",
+  "2026-12-04":"Reading Day — no classes",
+  "2026-12-11":"Last day of classes"
+};
+const MILESTONES = [
+  ["Aug 24","First day of classes"],
+  ["Aug 28","Last day to add or switch CHM 11520 sections without instructor approval"],
+  ["Sep 4","Last day to drop without it appearing on your record · last day to add CHM 11520 with approval"],
+  ["Sep 7","Labor Day — no classes · CHM lab safety certification due 11:59 PM"],
+  ["Oct 12–13","Fall Break"],
+  ["Nov 24","Last day to drop with a W"],
+  ["Nov 25–28","Thanksgiving Break"],
+  ["Dec 4","Reading Day"],
+  ["Dec 11","Last day of classes"],
+  ["Dec 14–19","Finals week"]
+];
+
+/* ============================================================
+   2. ASSIGNMENTS — pulled from the syllabi and assignment sheet
+   ============================================================ */
+const ITEMS = [];
+const add = (o)=>{ ITEMS.push(Object.assign({time:"",weight:"",note:"",prio:"Medium"},o)); };
+
+/* ---------- MA 16500 ---------- */
+[["2026-08-31","Lessons 1, 2, 3"],["2026-09-02","Lesson 4"],["2026-09-04","Lesson 5"],
+ ["2026-09-09","Lesson 6"],["2026-09-11","Lesson 7"],["2026-09-14","Lesson 8"],["2026-09-16","Lesson 9"],
+ ["2026-09-18","Lesson 10"],["2026-09-21","Lesson 11"],["2026-09-28","Lesson 12"],["2026-09-30","Lesson 13"],
+ ["2026-10-02","Lesson 14"],["2026-10-05","Lesson 15"],["2026-10-07","Lesson 16"],["2026-10-09","Lesson 17"],
+ ["2026-10-14","Lesson 18"],["2026-10-16","Lesson 19"],["2026-10-21","Lesson 20"],["2026-10-26","Lesson 21"],
+ ["2026-10-28","Lesson 22"],["2026-10-30","Lesson 23"],["2026-11-02","Lesson 24"],["2026-11-04","Lesson 25"],
+ ["2026-11-06","Lesson 26"],["2026-11-11","Lesson 27"],["2026-11-13","Lesson 28"],["2026-11-16","Lesson 29"],
+ ["2026-11-18","Lesson 30"],["2026-11-30","Lesson 31"],["2026-12-02","Lesson 32"],["2026-12-04","Lesson 33"]
+].forEach(([d,l],i)=>add({id:"ma-hw-"+i,course:"ma165",title:"MyLab Math — "+l,type:"Homework",due:d,
+  weight:"Homework 200 pts total",prio:"Medium",note:"Two lowest of 33 dropped."}));
+
+[["2026-09-06","Quiz 1","Covers Lessons 1–2 · given Thu Aug 27, due Sunday"],
+ ["2026-09-03","Quiz 2","Covers Lessons 3, 4, 5"],["2026-09-10","Quiz 3","Covers Lessons 6, 7"],
+ ["2026-09-24","Quiz 4","Covers Lessons 8, 9, 10"],["2026-10-01","Quiz 5","Covers Lessons 11, 12, 13"],
+ ["2026-10-08","Quiz 6","Covers Lessons 14, 15, 16"],["2026-10-22","Quiz 7","Covers Lessons 17, 18, 19"],
+ ["2026-10-29","Quiz 8","Covers Lessons 20, 21, 22"],["2026-11-12","Quiz 9","Covers Lessons 23–26"],
+ ["2026-11-19","Quiz 10","Covers Lessons 27–30"],["2026-12-03","Quiz 11","Covers Lessons 31, 32, 33"]
+].forEach(([d,t,n],i)=>add({id:"ma-qz-"+i,course:"ma165",title:"MA 16500 — "+t,type:"Quiz",due:d,
+  weight:"Quizzes 100 pts total",note:n+" · one lowest dropped."}));
+
+add({id:"ma-ex1",course:"ma165",title:"Exam 1",type:"Exam",due:"2026-09-23",time:"8:00–9:00 PM",
+  weight:"100 pts",prio:"High",note:"Covers Lessons 1–10. Daytime review that same day; study guide reviewed Thu Sep 17."});
+add({id:"ma-ex2",course:"ma165",title:"Exam 2",type:"Exam",due:"2026-10-19",time:"8:00–9:00 PM",
+  weight:"100 pts",prio:"High",note:"Covers Lessons 11–18. Study guide reviewed Thu Oct 15."});
+add({id:"ma-ex3",course:"ma165",title:"Exam 3",type:"Exam",due:"2026-11-09",time:"8:00–9:00 PM",
+  weight:"100 pts",prio:"High",note:"Covers Lessons 19–26. Study guide reviewed Thu Nov 5."});
+add({id:"ma-fin",course:"ma165",title:"Final Exam",type:"Exam",due:"2026-12-14",time:"Time TBA",
+  weight:"200 pts",prio:"High",note:"Scheduled somewhere in finals week, Dec 14–19. Confirm your slot in Purdue Scheduler. Reviews Dec 7, 9, 10, 11."});
+
+/* ---------- CHM 11520 lab ---------- */
+add({id:"chm-w1",course:"chm11520",title:"Week 1 — Lab orientation, Safety Quiz, Problem Solving",type:"Lab work",
+  due:"2026-08-26",time:"11:59 PM",weight:"10 pts (not dropped)",prio:"High",note:"Reading 1.3–1.5, 2.3–2.6. Due day of your lab."});
+add({id:"chm-w2",course:"chm11520",title:"Week 2 — Check-in, iPad orientation, Group Member Agreement",type:"Lab work",
+  due:"2026-09-02",time:"11:59 PM",weight:"5 pts (not dropped)",prio:"Medium",note:"Reading 2.7, 3.1, 3.3. Due day of your lab."});
+add({id:"chm-safety",course:"chm11520",title:"Online safety certification (20/25 minimum)",type:"Certification",
+  due:"2026-09-07",time:"11:59 PM",weight:"Gate for Lab 1",prio:"High",
+  note:"Without this you're sent home from Lab 1 with a zero. If you miss it, it reopens Fri Sep 11 at 6 PM, due the following Monday."});
+
+[[1,"Introduction to Measurement Techniques in the Lab","4.1","2026-09-08","2026-09-09"],
+ [2,"How Can We Use a Physical Property to Develop a Separation Method?","4.2, 4.3; 6.1–6.2","2026-09-15","2026-09-16"],
+ [3,"How Can We Produce a Salt from an Element?","6.3–6.6","2026-09-22","2026-09-23"],
+ [4,"What Variables Affect the Heat of a Reaction?","7.1–7.3","2026-09-29","2026-09-30"],
+ [5,"How Can Absorption of Light Be Used to Determine Concentration?","7.4; 8.1–8.2","2026-10-06","2026-10-07"],
+ [6,"Which Cereal Contains the Most Iron?","9.1–9.6","2026-10-20","2026-10-21"],
+ [7,"Do You See the Light?","10.1–10.2","2026-10-27","2026-10-28"],
+ [8,"How Does Molecular Shape Affect Polarity?","10.3; 12.1","2026-11-03","2026-11-04"],
+ [9,"How Can We Use Chromatography to Separate Plant Pigments?","12.2, 12.3, 12.6","2026-11-10","2026-11-11"],
+ [10,"What Are the Molecular Interactions of Washing?","13.1, 15.6, 13.6","2026-11-17","2026-11-18"],
+ [11,"What Are Synthetic and Biological Polymers?","5.x","2026-12-01","2026-12-02"]
+].forEach(([n,name,read,pre,rep])=>{
+  const flag = n===7 ? " Syllabus table leaves Week 10 blank — confirm these dates with your TA." : "";
+  add({id:"chm-l"+n+"-pre",course:"chm11520",title:"Lab "+n+" prelab quiz — "+name,type:"Prelab quiz",due:pre,time:"11:59 PM",
+    weight:"16 pts",prio:"High",note:"Reading "+read+". Watch the prelab video first — it unlocks the quiz. Miss it and you can't attend lab."+flag});
+  add({id:"chm-l"+n+"-proc",course:"chm11520",title:"Lab "+n+" experiment procedure",type:"Procedure",due:pre,time:"11:59 PM",
+    weight:"4 pts",prio:"High",note:"Hand-written pictorial summary: purpose, equipment/reagents, labeled diagram, safety and waste, lab manual citation."+flag});
+  add({id:"chm-l"+n+"-rep",course:"chm11520",title:"Lab "+n+" report",type:"Lab report",due:rep,time:"11:59 PM",
+    weight:"20 pts (incl. 2 participation)",prio:"High",note:"Two attempts, Turnitin-checked. Late reports are not accepted. Typed, full sentences, units and sig figs."+flag});
+});
+add({id:"chm-checkout",course:"chm11520",title:"Lab drawer check-out",type:"Lab work",due:"2026-12-09",time:"Your lab period",
+  weight:"$45 fee if missed",prio:"High",note:"Arrive on time, dressed, goggles on. More than 15 minutes late = $45 fee plus replacement costs. Reading 24.1, 24.5–24.7."});
+add({id:"chm-nofinal",course:"chm11520",title:"No final exam for CHM 11520",type:"Note",due:"2026-12-14",
+  weight:"—",prio:"Low",note:"Finals week has no lab final. Your CHM 11510 lecture final is separate."});
+
+/* ---------- SCLA 10200 ---------- */
+[["2026-08-25","Read the US Declaration of Independence (July 4, 1776) — on Brightspace"],
+ ["2026-08-27","Read Douglass, \"What to the Slave is the Fourth of July?\" and Lincoln's Gettysburg Address · Watch Art of Public Speaking Ep 1 & 9"],
+ ["2026-09-01","Read Paine, Common Sense (1776)"],
+ ["2026-09-03","Read Paine, Common Sense · Watch Ep 6, \"Use the Power of Three\""],
+ ["2026-09-08","Read Marx & Engels, Communist Manifesto ch. 1, pp. 219–34 · Watch Ep 7, \"Build a Logical Case\""],
+ ["2026-09-10","Read Communist Manifesto ch. 2–4, pp. 234–58 · Watch Ep 2, \"Practice Your Delivery\""],
+ ["2026-09-22","Read Vonnegut, \"Harrison Bergeron\" (Cornerstone Reader, pp. 131–7)"],
+ ["2026-09-24","Read Vonnegut, \"Harrison Bergeron\" · Watch Ep 5, \"Make it a Story\""],
+ ["2026-09-29","Read Weber, The Protestant Ethic, Part I, pp. 1–42"],
+ ["2026-10-01","Read Weber, Part II, pp. 67–127 · Watch Ep 4, \"Find Your Humorous Voice\""],
+ ["2026-10-06","Read Le Guin, \"The Ones Who Walk Away from Omelas\" (pp. 148–154)"],
+ ["2026-10-08","Read Le Guin, \"Omelas\" · Watch Ep 8, \"Paint Pictures in Words\""],
+ ["2026-10-15","Read Keynes, \"The End of Laissez Faire\" Parts I–II, pp. 57–66"],
+ ["2026-10-27","Read Keynes, Parts III–V, pp. 67–77"],
+ ["2026-10-29","Read Schumpeter, Can Capitalism Survive? ch. 1–5, pp. 1–94 · Watch Ep 3, \"Be Yourself\""],
+ ["2026-11-03","Read Schumpeter, ch. 6–10, pp. 95–195"],
+ ["2026-11-05","Watch Ep 10, \"Share a Vision\""],
+ ["2026-11-17","Read Kafka, \"The Metamorphosis\" (pp. 3–55)"],
+ ["2026-11-19","Read Hayek, The Road to Serfdom, Intro + ch. 1–8, pp. 57–146 · Watch Ep 11"],
+ ["2026-11-24","Read Hayek, ch. 9–16 and Conclusion, pp. 147–238 · Watch Ep 12 (Thanksgiving week)"],
+ ["2026-12-01","Read Proulx, \"Job History\" (pp. 155–162)"],
+ ["2026-12-03","Read Friedman, \"The Social Responsibility of Business Is to Increase Its Profits\" (pp. 144–7)"]
+].forEach(([d,t],i)=>add({id:"scla-rd-"+i,course:"scla102",title:t,type:"Reading",due:d,time:"Before class",
+  weight:"Participation 20%",prio:"Low",note:"Bring the book, a notebook and a pen — no devices. Come with notes on the reading."}));
+
+[["2026-09-03","Week 2 — on Paine, Common Sense"],["2026-09-10","Week 3 — on the Communist Manifesto"],
+ ["2026-09-24","Week 5 — on \"Harrison Bergeron\""],["2026-10-08","Week 7 — on \"Omelas\""],
+ ["2026-10-29","Week 10 — on Keynes / Schumpeter"],["2026-11-05","Week 11 — on Schumpeter"],
+ ["2026-11-19","Week 13 — on Kafka / Hayek"],["2026-12-03","Week 15 — on Proulx / Friedman"]
+].forEach(([d,t],i)=>add({id:"scla-wr-"+i,course:"scla102",title:"Written assignment — argumentative essay OR text analysis · "+t,
+  type:"Written",due:d,time:"In class",weight:"Essays 5% + Analyses 5%",prio:"Medium",
+  note:"Written in class, so it can't be made up without an ODOS excuse. You owe four essays and four analyses total — alternate them."}));
+
+add({id:"scla-p1",course:"scla102",title:"Presentation 1 — Learn from effective orators",type:"Presentation",
+  due:"2026-09-15",time:"In class (Sep 15 & 17)",weight:"10%",prio:"High",
+  note:"Deliver a famous speech of your choosing, then analyze persona, organization, figures of speech, images and tone. Email Prof. Jouin for approval of your speech BEFORE you start working."});
+add({id:"scla-p2",course:"scla102",title:"Presentation 2 — Turn an argument into a speech",type:"Presentation",
+  due:"2026-10-20",time:"In class (Oct 20 & 22)",weight:"10%",prio:"High",
+  note:"Pick an argument from the course readings and deliver it as a passionate speech, reusing strategies analyzed in Presentation 1."});
+add({id:"scla-p3",course:"scla102",title:"Presentation 3 — Weigh the pros and the cons",type:"Presentation",
+  due:"2026-11-10",time:"In class (Nov 10 & 12)",weight:"10%",prio:"High",
+  note:"Assigned a controversial topic; deliver two equally convincing speeches, for and against. The audience shouldn't be able to tell your real position."});
+add({id:"scla-p4",course:"scla102",title:"Presentation 4 — \"Flowers of rhetoric\" speech contest",type:"Presentation",
+  due:"2026-12-08",time:"In class (Dec 8 & 10)",weight:"30%",prio:"High",
+  note:"Biggest single grade in the course. Short question given, 5–7 minutes to prepare, then deliver. Classmates rank the top three speakers."});
+add({id:"scla-final",course:"scla102",title:"Final paper — capitalism and humanity",type:"Paper",
+  due:"2026-12-14",time:"Finals week, date TBA",weight:"10%",prio:"High",
+  note:"Written in class during finals week (Dec 14–19). Intro, at least two body paragraphs, conclusion. Guidelines on Brightspace and in the Course Packet."});
+
+[["2026-09-09","Reading Allowed — Declaration of Independence & Common Sense, Prof. Sebastian Graham","4:00 PM · Main Lobby, University Hall"],
+ ["2026-09-15","Film: To Begin the World Over Again — The Life of Thomas Paine (2016)","7:00–9:30 PM · Fowler Theatre"],
+ ["2026-10-08","Film: Pride and Prejudice (2005)","7:00–9:30 PM · Fowler Theatre"],
+ ["2026-10-20","Film: Othello (1995)","7:00–9:30 PM · Fowler Theatre"],
+ ["2026-11-03","Reading Allowed — \"The Star-Spangled Banner\" & \"America the Beautiful\", Prof. Dylan Crosson","3:30 PM · Cornerstone Reading Room, HSSE Library"],
+ ["2026-11-06","Reading Allowed (repeat session)","3:30 PM · Rueff Gallery, Pao Hall"],
+ ["2026-12-01","Reading Allowed — O. Henry, \"The Gift of the Magi\", Prof. George Elliott","4:00 PM · Cornerstone Reading Room, HSSE Library"]
+].forEach(([d,t,when],i)=>add({id:"scla-ec-"+i,course:"scla102",title:"Extra credit — "+t,type:"Extra credit",due:d,time:when,
+  weight:"Up to 3% total",prio:"Low",note:"Submit a host-signed attendance form plus a 1–2 page essay connecting the event to the course. Maximum two extra-credit submissions all semester."}));
+
+/* ---------- CHM 11510 lecture ---------- */
+add({id:"chm15-math",course:"chm11510",title:"Math Review",type:"Assignment",due:"2026-09-02",time:"11:59 PM",
+  weight:"5 pts",prio:"Medium",
+  note:"Opening review of units, sig figs and problem solving. Exact due date lives on the Brightspace lecture-recitation-exam schedule — confirm it."});
+
+["2026-09-02","2026-09-09","2026-09-16","2026-09-23","2026-09-30","2026-10-07","2026-10-14",
+ "2026-10-21","2026-10-28","2026-11-04","2026-11-11","2026-11-18","2026-12-02","2026-12-09"
+].forEach((d,i)=>add({id:"chm15-hw-"+i,course:"chm11510",title:"Achieve homework "+(i+1),type:"Homework",due:d,time:"11:59 PM",
+  weight:"10 pts",prio:"Medium",
+  note:"5 attempts per question, −5% per wrong try. Best 13 of 14 count. No extensions except excused absences. Exam questions often come straight from homework."}));
+
+[["2026-09-02","2026-09-03"],["2026-09-09","2026-09-10"],["2026-09-16","2026-09-17"],["2026-09-23","2026-09-24"],
+ ["2026-09-30","2026-10-01"],["2026-10-07","2026-10-08"],["2026-10-21","2026-10-22"],["2026-10-28","2026-10-29"],
+ ["2026-11-04","2026-11-05"],["2026-11-11","2026-11-12"],["2026-11-18","2026-11-19"],["2026-12-02","2026-12-03"],
+ ["2026-12-09","2026-12-10"]
+].forEach(([q,w],i)=>{
+  add({id:"chm15-pq-"+i,course:"chm11510",title:"Pre-recitation quiz (Gradescope)",type:"Pre-recitation quiz",due:q,time:"11:59 PM",
+    weight:"5 pts",prio:"Medium",
+    note:"Due the night before your Thursday recitation. Covers what you'll practice in recitation. No collaboration allowed. Best 8 of 9 count — a few weeks won't have one, so check Brightspace."});
+  add({id:"chm15-rw-"+i,course:"chm11510",title:"Recitation — attend + upload worksheet PDF",type:"Recitation",due:w,time:"Class 4:30 PM · upload by 11:59 PM",
+    weight:"5 pts attendance + 5 pts worksheet",prio:"Medium",
+    note:"Arrive within the first 10 minutes (one grace late per semester). Upload the completed worksheet — all calculation work shown — as a PDF to Gradescope the same day. Best 10 attendance and best 9 of 10 worksheets count."});
+});
+
+/* The lecture-recitation-exam schedule marks the Exam 1 review recitation as having
+   no pre-recitation quiz and no worksheet upload — Exam 1 is the same evening. */
+(function(){
+  const qi=ITEMS.findIndex(x=>x.id==="chm15-pq-3"); if(qi>=0) ITEMS.splice(qi,1);
+  const r=ITEMS.find(x=>x.id==="chm15-rw-3");
+  if(r){
+    r.title="Recitation — Exam 1 review session";
+    r.time="Class 4:30 PM";
+    r.weight="5 pts attendance";
+    r.prio="High";
+    r.note="Marked on the course schedule as the Exam 1 review: no pre-recitation quiz and no worksheet upload this week. Attendance still counts — and Exam 1 is the same night at 8:00 PM. Reviews before Exams 2 and 3 likely follow the same pattern; confirm on Brightspace.";
+  }
+})();
+
+add({id:"chm15-ex1",course:"chm11510",title:"Exam 1",type:"Exam",due:"2026-09-24",time:"8:00–9:00 PM",
+  weight:"155 pts",prio:"High",
+  note:"Covers Lectures 1–9: fundamentals (units, sig figs, the atom, the mole, stoichiometry, molarity, reaction types) plus thermochemistry, Ch. 1–4 and 6. Paper, multiple choice, 60 minutes, ~half conceptual and half calculation. Review recitation the same afternoon. Room posted on Brightspace beforehand. Simple scientific calculator only. Conflict? Email Marybeth Miller a full week ahead."});
+add({id:"chm15-ex2",course:"chm11510",title:"Exam 2",type:"Exam",due:"2026-10-21",time:"8:00–9:00 PM",
+  weight:"155 pts",prio:"High",
+  note:"Covers Lectures 10–15ish: quantum theory and atomic structure (Ch. 7), electron configuration and periodicity (Ch. 8), into models of chemical bonding (Ch. 9). Note it falls on a Wednesday. Check Brightspace for your assigned room — it can change between exams."});
+add({id:"chm15-ex3",course:"chm11510",title:"Exam 3",type:"Exam",due:"2026-11-19",time:"8:00–9:00 PM",
+  weight:"155 pts",prio:"High",
+  note:"Covers Lectures 16–23ish: bonding (Ch. 9), shapes of molecules and VSEPR (Ch. 10), intermolecular forces, phase changes and the solid state (Ch. 12), into solutions (13.1, 15.6). Falls on the same Thursday as your recitation."});
+add({id:"chm15-final",course:"chm11510",title:"Final Exam (comprehensive)",type:"Exam",due:"2026-12-14",time:"Date & time TBA",
+  weight:"310 pts",prio:"High",
+  note:"Comprehensive — everything from units and sig figs through gases (Ch. 5) and nuclear chemistry (Ch. 24). Split into two 155-pt halves for the drop calculation, so a strong final can replace your weakest midterm. Don't book travel until the finals schedule posts; it will not be rescheduled for travel."});
+add({id:"chm15-iclicker",course:"chm11510",title:"iClicker lecture participation — reach 20 scored lectures",type:"Participation",
+  due:"2026-12-10",time:"Across the semester",weight:"60 pts + up to 10 extra credit",prio:"Medium",
+  note:"3 pts per lecture where you answer, best 20 of 26 count, so 6 misses are free. Answer correctly for 0.5 pt extra credit each. Must be in person on a phone or laptop."});
+add({id:"chm15-surveys",course:"chm11510",title:"Goal Setting and Reflection surveys (extra credit)",type:"Extra credit",
+  due:null,time:"Dates on Brightspace",weight:"4 pts extra credit",prio:"Low",
+  note:"Free points. Watch for the announcements and add the dates here when they post."});
+
+/* ---------- ACCT 20000 ---------- */
+add({id:"acct-syllquiz",course:"acct200",title:"Syllabus quiz",type:"Quiz",due:"2026-09-06",time:"End of day",
+  weight:"Counts in the SmartBook Review category",prio:"Medium",
+  note:"Opens Week 1 and stays open until Sep 6. Graded with the SmartBook reviews."});
+
+[["Chapters 1 & 2 — A Framework for Financial Accounting; Accounting Cycle: During the Period","2026-09-06","2026-09-06"],
+ ["Chapter 3 — Accounting Cycle: End of the Period","2026-09-13","2026-09-16"],
+ ["Chapter 4 — Cash and Internal Controls","2026-09-23","2026-09-27"],
+ ["Chapter 5 — Receivables and Sales","2026-09-30","2026-10-04"],
+ ["Chapter 6 — Inventory and Cost of Goods Sold","2026-10-07","2026-10-11"],
+ ["Chapter 7 — Long-Term Assets","2026-10-18","2026-10-21"],
+ ["Chapter 8 — Current Liabilities","2026-11-01","2026-11-01"],
+ ["Chapter 9 — Long-Term Liabilities / Time Value of Money","2026-11-04","2026-11-08"],
+ ["Chapter 10 — Stockholders' Equity","2026-11-11","2026-11-15"],
+ ["Chapter 11 — Statement of Cash Flows","2026-11-18","2026-11-22"],
+ ["Chapter 12 — Financial Statement Analysis","2026-12-02","2026-12-06"]
+].forEach(([ch,sb,hw],i)=>{
+  add({id:"acct-sb-"+i,course:"acct200",title:"SmartBook review — "+ch,type:"SmartBook",due:sb,time:"End of day",
+    weight:"SmartBook 15%",prio:"Low",
+    note:"No penalty for wrong answers — just move the progress bar to completion. Lowest review score is dropped."});
+  add({id:"acct-hw-"+i,course:"acct200",title:"Connect homework — "+ch,type:"Homework",due:hw,time:"End of day",
+    weight:"Homework 20%",prio:"Medium",
+    note:"Unlimited attempts and unlimited Check My Work. Lowest homework score is dropped. No late submissions."});
+});
+
+add({id:"acct-ex1",course:"acct200",title:"Exam 1 — Chapters 1–3",type:"Exam",due:"2026-09-17",time:"8:00–9:00 PM",
+  weight:"15%",prio:"High",
+  note:"40–50 multiple choice. Review in class Wed Sep 16; no class Fri Sep 18. Curved if the class average falls below 75%. No AI on exams."});
+add({id:"acct-ex2",course:"acct200",title:"Exam 2 — Chapters 4–7",type:"Exam",due:"2026-10-27",time:"8:00–9:00 PM",
+  weight:"20%",prio:"High",
+  note:"40–50 multiple choice. Review in class Wed Oct 21; no class Fri Oct 23 because of this exam."});
+add({id:"acct-ex3",course:"acct200",title:"Exam 3 — Chapters 8–12 (finals week)",type:"Exam",due:"2026-12-14",time:"Date & time TBA",
+  weight:"25%",prio:"High",
+  note:"Biggest single grade in the course. Reviews in class Dec 7 and Dec 9; no class Dec 11. The finals schedule isn't published until several weeks into the term — don't book travel until it is, and no early finals are given."});
+add({id:"acct-partic",course:"acct200",title:"iClicker participation — reach 60 answered questions",type:"Participation",
+  due:"2026-12-09",time:"Across the semester",weight:"5%",prio:"Medium",
+  note:"She asks more than 60, so missing a class here and there is fine. Track your running count in Brightspace — the iClicker app total is inflated by exam-review questions. Technical issue? Tell her before you leave class."});
+/* ---------- ENGL 10800 ---------- */
+add({id:"engl-u1-read",course:"engl108",title:"Unit 1 reading — Cultural Objects and Cultural Values",type:"Reading",
+  due:"2026-09-22",time:"Across the unit",weight:"Feeds quizzes & Q/Cs",prio:"Medium",
+  note:"Norton Parts 1–2 (ch. 1–11), ch. 29–34, 38, 47–54. On Brightspace: Evaluating Sources module, MLA materials, Academic Integrity materials, \"Maps,\" Okakok, Cullinan's \"If Nature Had Rights,\" Momaday, duCille's \"Multicultural Barbie.\" Rhetoric chapters are short and quizzes often combine several."});
+add({id:"engl-p1",course:"engl108",title:"Project 1 — textual analysis of a cultural object",type:"Formal project",
+  due:"2026-09-22",time:"Approximate — confirm in class",weight:"Formal project",prio:"High",
+  note:"Individual or partner project: how does an object tell a story about the culture that produced it? Turn in a hard copy in class AND an identical electronic copy on Brightspace — mismatches can cost you points."});
+
+add({id:"engl-u2-read",course:"engl108",title:"Unit 2 reading — Representing Social Issues, Inequalities, Injustices",type:"Reading",
+  due:"2026-10-29",time:"Across the unit",weight:"Feeds quizzes & Q/Cs",prio:"Medium",
+  note:"Norton Part 4 (ch. 24–26), ch. 56–59, ch. 27–28, pp. 48–51, ch. 47, ch. 50–51. Plus George's \"Changing the Face of Poverty,\" Cook's \"Poor Shaming…,\" Green on Roxane Gay's Hunger, and hooks, Reich, Smarsh, Alexie, Hedges & Sacco on Brightspace."});
+add({id:"engl-p2",course:"engl108",title:"Project 2 — group presentation on a film and Unit 2 issues",type:"Formal project",
+  due:"2026-10-29",time:"Window: Oct 20 – Oct 29",weight:"Formal project",prio:"High",
+  note:"Group presentation to the class on where a film intersects the social issues from Unit 2. Presentations run across the Oct 20–29 window, so find out your group's date early."});
+
+add({id:"engl-u3-read",course:"engl108",title:"Unit 3 reading — Humans & the Environment",type:"Reading",
+  due:"2026-12-03",time:"Across the unit",weight:"Feeds quizzes & Q/Cs",prio:"Medium",
+  note:"Review Norton Parts 3 and 8, plus Carson, LaDuke, Berry and Pancake on Brightspace."});
+add({id:"engl-p3",course:"engl108",title:"Project 3 — traditional essay or multimedia option",type:"Formal project",
+  due:"2026-12-03",time:"Approximate — confirm in class",weight:"Formal project",prio:"High",
+  note:"You choose the format. Hard copy in class plus an identical Brightspace upload."});
+
+add({id:"engl-u4-read",course:"engl108",title:"Unit 4 reading — Norton ch. 34 & 35 (portfolio)",type:"Reading",
+  due:"2026-12-07",time:"Dec 7 – Dec 11",weight:"—",prio:"Low",
+  note:"Short unit with few informal activities — it's mostly portfolio assembly."});
+add({id:"engl-p4",course:"engl108",title:"Final Portfolio Project (ICaP common assignment)",type:"Portfolio",
+  due:"2026-12-14",time:"Approximate — acts as the final",weight:"Serves as the course final",prio:"High",
+  note:"Collect and reflect on your work from the whole semester. Required in every ICaP course — keep every draft from Unit 1 onward."});
+
+add({id:"engl-quiz-intro",course:"engl108",title:"Syllabus / Intro to Course quiz + Plagiarism quiz",type:"Quiz",
+  due:null,time:"Early in Unit 1",weight:"1–20 pts each",prio:"Medium",
+  note:"Both live on Brightspace. Dates aren't in the overview — add them here once she posts the detailed Unit 1 schedule."});
+
+/* ============================================================
+   3. State + storage
+   ============================================================ */
+const KEY = "purdue_f26_tracker_v1";
+let state = { edits:{}, custom:[], map:null };
+let saveTimer=null, memoryOnly=false;
+
+async function loadState(){
+  try{
+    if(!window.storage) { memoryOnly=true; return; }
+    const r = await window.storage.get(KEY);
+    if(r && r.value){ const p=JSON.parse(r.value); state = Object.assign(state,p); }
+  }catch(e){ /* first run: no key yet */ }
+}
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    if(memoryOnly || !window.storage){ toast("Saved for this session"); return; }
+    try{ await window.storage.set(KEY, JSON.stringify(state)); toast("Saved"); }
+    catch(e){ toast("Couldn't save — try again"); }
+  }, 350);
+}
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),1300);
+}
+function edit(id){ return state.edits[id] || {}; }
+function setEdit(id,k,v){ (state.edits[id] = state.edits[id] || {})[k]=v; save(); }
+
+function allItems(){ return ITEMS.concat(state.custom); }
+
+/* ---- urgency ---- */
+const URG=[
+  {k:"overdue",label:"Overdue"},{k:"today",label:"Due today"},{k:"tomorrow",label:"Due tomorrow"},
+  {k:"soon",label:"Within 3 days"},{k:"week",label:"This week"},{k:"two",label:"Within 2 weeks"},
+  {k:"later",label:"Later"},{k:"none",label:"No date"},{k:"done",label:"Done"}
+];
+function urgency(it){
+  if(itemStatus(it)==="Done") return {k:"done",label:"Done",rank:8};
+  if(!it.due) return {k:"none",label:"TBA",rank:7};
+  const n=daysBetween(today(),parseD(it.due));
+  if(n<0)  return {k:"overdue", label:Math.abs(n)+(Math.abs(n)===1?" day late":" days late"), rank:0};
+  if(n===0)return {k:"today",   label:"Today", rank:1};
+  if(n===1)return {k:"tomorrow",label:"Tomorrow", rank:2};
+  if(n<=3) return {k:"soon",    label:"In "+n+" days", rank:3};
+  if(n<=7) return {k:"week",    label:"In "+n+" days", rank:4};
+  if(n<=14)return {k:"two",     label:"In "+n+" days", rank:5};
+  return    {k:"later",  label:"In "+n+" days", rank:6};
+}
+function isCritical(it){
+  const u=urgency(it);
+  if(u.rank>4) return false;
+  return u.rank<=1 || it.type==="Exam" || itemPrio(it)==="High";
+}
+
+/* ---- absence & AI policies, per course ---- */
+const RULES={
+  ma165:{
+    absence:"Attendance is required at both lecture and recitation, and it is worth 30 of the 830 points. Lecture attendance checks run from Aug 31 through Dec 2. The syllabus does not spell out a make-up process, so email Prof. Matsuki early if you have to miss.",
+    ai:"You may use AI on homework and quizzes as long as it is enhancing your learning rather than handing you answers — you should be able to solve the problem unaided afterward. Calculators are fine on homework and quizzes. No calculator and no AI during exams.",
+    late:"Past-due MyLab Math assignments are counted as zero at the end of the term, even though the MLM display excludes them and may look deceptively high."},
+  chm11510:{
+    absence:"Missed a lecture? Tell nobody — only your best 20 of 26 iClicker scores count, so six absences are already absorbed. Recordings are on Boilercast/Kaltura. For recitation, homework or quizzes missed on an ODOS-excused absence (GAPS, MAPS, MEAPS, NCAA travel), file the request in the Absences module for make-up work or an extension. For unexcused absences there is no form to fill out: the lowest score in each category is simply dropped. Miss an exam and you must email CHM11510LEC@purdue.edu immediately; a known conflict needs Marybeth Miller at least one calendar week ahead.",
+    ai:"Encouraged for generating practice problems, making quizlets, proofreading, exploring examples, and the Achieve AI Tutor. Prohibited for obtaining answers to graded work, and you may never upload lecture slides, quiz questions, or Achieve problems into any AI platform. Disclose AI use on recitation worksheets — name the tool and how you used it.",
+    late:"No deadline extensions on homework except for excused absences. Recitation attendance requires arriving within the first 10 minutes; you get one grace late arrival."},
+  chm11520:{
+    absence:"Lab attendance is mandatory. You get one free make-up lab per semester for any reason — but you must request it BEFORE your lab start time. Excused absences (ODOS) allow up to four make-ups. All other absences are covered by the automatic drop of your lowest prelab, procedure, and report score. Critically, you must still complete 9 of 11 labs: finish only 8 and your final grade drops a full letter; 7 or fewer is an F regardless of points.",
+    ai:"Completely prohibited. Using ChatGPT or any AI agent, or uploading lab manuals and quiz questions to an AI platform, is treated as academic dishonesty. Points lost to academic dishonesty are also ineligible for dropping.",
+    late:"Late lab reports are never accepted. Missing the prelab quiz or procedure bars you from attending lab that week, which forfeits the 20-point report too."},
+  acct200:{
+    absence:"There is no attendance policy and she does not take attendance. The only exposure is the 5% iClicker participation grade, and since she asks well over the 60 questions required, occasional absences cost you nothing. If documented ODOS or Athletics absences exceed 6 class sessions, contact her about an accommodation.",
+    ai:"Allowed throughout the course, with one exception: no AI on the three exams.",
+    late:"No late assignments accepted and no individual extra credit. Any extra credit is offered to the whole class. Raise grade concerns within 3 business days of posting."},
+  scla102:{
+    absence:"Three sick days, no penalty, no questions. Every absence after the third cuts 3% off your final grade, and more than five absences can fail you outright. Only absences that ODOS formally labels excused count as excused, and Prof. Jouin needs the official letter. Email him with the subject line \"SCLA 102 absence\" — no symptom details needed. Lateness: arriving within 15 minutes is late, beyond 15 minutes is absent, and two lates equal one absence.",
+    ai:"Chatbot use is forbidden. Submitting AI-generated writing or research carries the same penalty as plagiarism and goes to OSRR. Separately, the classroom is device-free — phones, tablets and laptops are not permitted, and using one gets you escorted out and marked absent.",
+    late:"Papers and presentations are done in class, so late work is not accepted at all. An ODOS-excused absence gets the assignment rescheduled; an unexcused one gets a zero. He does not offer make-ups for unexcused absences."},
+  engl108:{
+    absence:"Two separate limits, and the second one is the dangerous one. UNEXCUSED: past 5, your final grade drops a third of a letter for every additional absence — the penalty starts at absence #6. TOTAL, counting excused ones: reach 9 absences for any reason whatsoever and you receive an F for the course, no exceptions. She takes attendance from day one and records it even if you enrolled late. Excused categories are religious holidays, university-sanctioned events, grief, MEAP medical, military, jury duty and parenting leave — ODOS usually requires documentation. If you are ill and email her BEFORE class that day, and your attendance is otherwise clean, she will usually excuse it at her discretion. Tardy: more than 20 minutes late counts as absent, and if you arrive after roll it is on you to tell her that same day or the absent mark stands.",
+    ai:"Permitted for brainstorming, finding information on your topic, checking mechanics and readability, and formatting citations. Prohibited for impersonating you, writing a draft or detailed outline, writing entire sentences or paragraphs, and content creation or automated design. Disclosure is mandatory: every formal project needs an Acknowledgment Statement listing every tool you used and how you used it, placed right before the Works Cited, plus a citation on the Works Cited that includes the prompt you fed the tool. Save your AI interactions so you can show your work if something gets flagged. Ask her before using Grammarly Premium — large-scale rephrasing is not a permitted use.",
+    late:"Informal Activities are not accepted late at all, barring extraordinary circumstances or an arrangement made in advance. Formal Projects run on a clock: within 24 hours late costs one full letter grade, from 24 to 48 hours costs 50%, and after 48 hours it is a zero. Talk to her BEFORE the due date if you can see a problem coming. Every formal project also needs a hard copy in class plus an identical electronic copy on Brightspace."}
+};
+function itemStatus(it){ return edit(it.id).status || "Not Started"; }
+function itemPrio(it){ return edit(it.id).prio || it.prio || "Medium"; }
+function itemNotes(it){ return edit(it.id).notes != null ? edit(it.id).notes : ""; }
+
+/* ============================================================
+   4. Date helpers
+   ============================================================ */
+const DOW=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function parseD(s){ if(!s) return null; const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
+function key(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function today(){ const n=new Date(); return new Date(n.getFullYear(),n.getMonth(),n.getDate()); }
+function daysBetween(a,b){ return Math.round((b-a)/86400000); }
+function fmtLong(d){ return DOW[d.getDay()]+", "+MON[d.getMonth()]+" "+d.getDate(); }
+function fmtShort(d){ return MON[d.getMonth()].slice(0,3)+" "+d.getDate(); }
+function relative(d){
+  const n=daysBetween(today(),d);
+  if(n===0) return "Today"; if(n===1) return "Tomorrow"; if(n===-1) return "Yesterday";
+  if(n<0) return Math.abs(n)+" days ago";
+  return "in "+n+" days";
+}
+function mins(hhmm){ const [h,m]=hhmm.split(":").map(Number); return h*60+m; }
+function fmtTime(hhmm){
+  let [h,m]=hhmm.split(":").map(Number); const ap = h>=12?"PM":"AM"; h=h%12||12;
+  return h+":"+String(m).padStart(2,"0")+" "+ap;
+}
+
+/* ============================================================
+   5. Weekly grid
+   ============================================================ */
+const START_H=7, END_H=18, PX=56;
+function renderGrid(host){
+  const t = new Date(); const dow = t.getDay();
+  let head = '<div class="wg-head"><div></div>';
+  ["Monday","Tuesday","Wednesday","Thursday","Friday"].forEach((d,i)=>{
+    head += '<div class="'+(dow===i+1?"today":"")+'">'+d+'</div>';
+  });
+  head += '</div>';
+
+  let times='<div class="wg-times">';
+  for(let h=START_H;h<END_H;h++){
+    times += '<div class="hr"><span>'+((h%12)||12)+" "+(h<12?"AM":"PM")+'</span></div>';
+  }
+  times += '</div>';
+
+  let cols="";
+  for(let d=1; d<=5; d++){
+    let inner="";
+    for(let h=START_H;h<END_H;h++) inner+='<div class="hr"></div>';
+    MEETINGS.filter(m=>m.d===d).forEach(m=>{
+      const c=C[m.c];
+      const top=(mins(m.s)-START_H*60)/60*PX;
+      const hgt=Math.max(30,(mins(m.e)-mins(m.s))/60*PX-3);
+      inner += '<div class="evt" style="top:'+top+'px;height:'+hgt+'px;--c:'+c.c+';--tint:'+c.tint+'">'
+        + '<b>'+m.label+'</b><em>'+fmtTime(m.s)+" – "+fmtTime(m.e)+'</em><em>'+m.room+'</em></div>';
+    });
+    cols += '<div class="wg-col '+(dow===d?"today":"")+'">'+inner+'</div>';
+  }
+
+  let now="";
+  const nowMin = t.getHours()*60+t.getMinutes();
+  if(dow>=1 && dow<=5 && nowMin>=START_H*60 && nowMin<=END_H*60){
+    now = '<div class="nowline" style="top:'+((nowMin-START_H*60)/60*PX)+'px"></div>';
+  }
+  host.innerHTML = '<div class="weekgrid">'+head+'<div class="wg-body">'+times+cols+now+'</div></div>';
+}
+
+/* ============================================================
+   6. Command Center
+   ============================================================ */
+const TOOLS=[
+  ["Brightspace","https://purdue.brightspace.com","primary",""],
+  ["myPurdue","https://mypurdue.purdue.edu","primary",""],
+  ["Google Calendar","https://calendar.google.com","",""],
+  ["Purdue email","https://outlook.office.com","",""]
+];
+const COURSE_TOOLS=[
+  ["MyLab Math","https://purdue.brightspace.com","ma165"],
+  ["Achieve (Chem HW)","https://achieve.macmillanlearning.com","chm11510"],
+  ["Gradescope","https://www.gradescope.com","chm11510"],
+  ["iClicker","https://student.iclicker.com","chm11510"],
+  ["Labflow","https://app.labflow.com","chm11520"],
+  ["Connect (Accounting)","https://connect.mheducation.com","acct200"],
+  ["Piazza","https://piazza.com","acct200"],
+  ["Purdue OWL","https://owl.purdue.edu","engl108"]
+];
+const TILES=[
+  ["overview","Overview","What's overdue, what's due soon, progress per course"],
+  ["calendar","Calendar","Day, week and month views of every deadline"],
+  ["exams","Exams","All 8 exams — mark them taken and log your scores"],
+  ["grades","Grades & absences","Weights, attendance rules, late work, AI policy"],
+  ["schedule","Schedule","The full weekly grid and room list"]
+];
+
+function timeRank(it){
+  const m=(it.time||"").match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if(!m) return 24*60+1;
+  let h=+m[1]; const ap=m[3].toUpperCase();
+  if(ap==="PM"&&h<12) h+=12; if(ap==="AM"&&h===12) h=0;
+  return h*60+(+m[2]);
+}
+function classesOn(dow){ return MEETINGS.filter(m=>m.d===dow).sort((a,b)=>mins(a.s)-mins(b.s)); }
+function dueOn(ymd){
+  return allItems().filter(i=>i.due===ymd && itemStatus(i)!=="Done")
+    .sort((a,b)=>timeRank(a)-timeRank(b) || (a.type==="Exam"?-1:1));
+}
+
+function todayPanelHTML(){
+  const now=new Date(), dow=now.getDay(), nowMin=now.getHours()*60+now.getMinutes();
+  const t=today(), tk=key(t);
+  const tm=new Date(t); tm.setDate(tm.getDate()+1);
+  const cls=classesOn(dow), due=dueOn(tk);
+  const tmCls=classesOn(tm.getDay()).length, tmDue=dueOn(key(tm)).length;
+  const nextIdx=cls.findIndex(m=>mins(m.s)>nowMin);
+
+  /* remaining days in the calendar week (week runs Sun-Sat, so daysLeft counts to Saturday) */
+  const daysLeftInWeek = 6 - dow;
+  const upcomingDates = [];
+  for(let off=1; off<=daysLeftInWeek; off++){ const d=new Date(t); d.setDate(d.getDate()+off); upcomingDates.push(d); }
+
+  let restClassesHTML;
+  if(!upcomingDates.length){
+    restClassesHTML = '<div class="clear" style="padding:14px 0"><b>That\'s the whole week.</b>No more class days before Sunday.</div>';
+  } else {
+    restClassesHTML = upcomingDates.map(d=>{
+      const dayCls = classesOn(d.getDay());
+      return '<div style="padding:9px 0;border-bottom:1px solid var(--rule)">'
+        + '<div style="font-family:var(--serif);font-size:13.5px;font-weight:600;margin-bottom:4px">'+fmtLong(d)+'</div>'
+        + (dayCls.length ? dayCls.map(m=>{
+            const c=C[m.c];
+            return '<div class="cls" style="padding:6px 0"><span class="rail" style="background:'+c.c+'"></span><span class="tm"><b>'+fmtTime(m.s)+'</b>'+fmtTime(m.e)+'</span><span class="bd"><b>'+m.label+'</b><span>'+m.room+'</span></span></div>';
+          }).join("") : '<span style="color:var(--ink-3);font-size:12.5px">No classes</span>')
+        + '</div>';
+    }).join("");
+  }
+
+  let restDueHTML;
+  const anyDue = upcomingDates.some(d=>dueOn(key(d)).length);
+  if(!upcomingDates.length){
+    restDueHTML = '<div class="clear" style="padding:14px 0"><b>That\'s the whole week.</b>Nothing more scheduled before Sunday.</div>';
+  } else if(!anyDue){
+    restDueHTML = '<div class="clear" style="padding:14px 0"><b>Nothing else due this week.</b>You\'re clear through Sunday.</div>';
+  } else {
+    restDueHTML = upcomingDates.map(d=>{
+      const items = dueOn(key(d));
+      if(!items.length) return '';
+      return '<div style="padding:9px 0;border-bottom:1px solid var(--rule)">'
+        + '<div style="font-family:var(--serif);font-size:13.5px;font-weight:600;margin-bottom:4px">'+fmtLong(d)+'</div>'
+        + items.map(it=>{
+            const c=C[it.course];
+            return '<div class="due" style="padding:6px 0"><span class="rail" style="background:'+c.c+'"></span><span class="bd"><b>'+esc(it.title)+'</b><span class="m">'+c.code+' · '+esc(it.type)+(it.time?" · "+esc(it.time):"")+'</span></span></div>';
+          }).join("")
+        + '</div>';
+    }).join("");
+  }
+
+  let h='<div class="hero"><p class="date">'+fmtLong(t)+'</p><h2>'+greeting()+'</h2>'
+    + '<p class="sum">'+summaryLine(cls,due,nowMin)+'</p></div>';
+
+  h += '<div class="today2">';
+
+  /* classes */
+  h += '<section class="panel"><header><h3>Today\'s classes</h3><span class="n">'+cls.length+'</span></header><div class="body">';
+  if(!cls.length){
+    h += '<div class="clear"><b>No classes today.</b>Enjoy it.</div>';
+  } else {
+    cls.forEach((m,idx)=>{
+      const c=C[m.c], live=nowMin>=mins(m.s)&&nowMin<=mins(m.e), past=nowMin>mins(m.e);
+      h += '<div class="cls '+(live?"now":"")+' '+(past?"past":"")+'">'
+        + '<span class="rail" style="background:'+c.c+'"></span>'
+        + '<span class="tm"><b>'+fmtTime(m.s)+'</b>'+fmtTime(m.e)+'</span>'
+        + '<span class="bd"><b>'+m.label+'</b><span>'+m.room+' · '+esc(c.instructor.split("·")[0].trim())+'</span>'
+        + (live?' <span class="stateflag live">In session</span>':(idx===nextIdx?' <span class="stateflag next">Up next</span>':''))
+        + '</span></div>';
+    });
+  }
+  h += '</div><div class="foot">Tomorrow: '+(tmCls?tmCls+' class'+(tmCls>1?'es':''):'no classes')
+    + (upcomingDates.length?' <button class="btn" id="toggleWeekClasses" style="margin-left:8px;padding:3px 9px;font-size:11px">Show rest of week</button>':'')
+    + '</div>'
+    + '<div class="body" id="weekClassesBody" style="display:none">'+restClassesHTML+'</div>'
+    + '</section>';
+
+  /* due */
+  h += '<section class="panel"><header><h3>Due today</h3><span class="n">'+due.length+'</span></header><div class="body">';
+  if(!due.length){
+    h += '<div class="clear"><b>Nothing due today.</b>Good time to get ahead.</div>';
+  } else {
+    due.forEach(it=>{
+      const c=C[it.course], st=itemStatus(it);
+      h += '<div class="due arow" data-id="'+it.id+'">'
+        + '<span class="rail" style="background:'+c.c+'"></span>'
+        + '<span class="bd"><b>'+esc(it.title)+'</b>'
+        + '<span class="m">'+c.code+' · '+esc(it.type)+(it.time?" · "+esc(it.time):"")+'</span>'
+        + '<select class="status" data-k="status" data-v="'+st+'">'
+        + ["Not Started","In Progress","Done"].map(o=>'<option'+(o===st?" selected":"")+'>'+o+'</option>').join("")
+        + '</select></span></div>';
+    });
+  }
+  h += '</div><div class="foot">Tomorrow: '+(tmDue?tmDue+' item'+(tmDue>1?'s':'')+' due':'nothing due')
+    + (upcomingDates.length?' <button class="btn" id="toggleWeekDue" style="margin-left:8px;padding:3px 9px;font-size:11px">Show due this week</button>':'')
+    + '</div>'
+    + '<div class="body" id="weekDueBody" style="display:none">'+restDueHTML+'</div>'
+    + '</section>';
+  h += '</div>';
+  return h;
+}
+function greeting(){
+  const hr=new Date().getHours();
+  return hr<12?"Good morning.":hr<17?"Good afternoon.":"Good evening.";
+}
+function summaryLine(cls,due,nowMin){
+  const left=cls.filter(m=>mins(m.e)>nowMin).length;
+  const od=allItems().filter(i=>i.due&&parseD(i.due)<today()&&itemStatus(i)!=="Done").length;
+  const bits=[];
+  bits.push(left?left+" class"+(left>1?"es":"")+" left today":"no classes left today");
+  bits.push(due.length?due.length+" item"+(due.length>1?"s":"")+" due":"nothing due");
+  if(od) bits.push(od+" past due");
+  return bits.join(" · ");
+}
+
+function buildCommand(){
+  const host=document.getElementById("page-command");
+  let h = todayPanelHTML();
+
+  /* quick links */
+  h += '<div class="block" style="margin-top:30px"><p class="eyebrow">Jump to</p>'
+    + '<h2 class="section">Quick links</h2><div class="qlinks">'
+    + TOOLS.map(t=>'<a class="ql '+t[2]+'" href="'+t[1]+'" target="_blank" rel="noopener">'+t[0]+'</a>').join("")
+    + '<button class="ql" data-ics="30">Next 30 days → Apple Calendar</button>'
+    + '<button class="ql" data-ics="exams">Exams → Apple Calendar</button>'
+    + '</div>'
+    + '<div class="qlinks" style="margin-top:9px">'
+    + COURSE_TOOLS.map(t=>'<a class="ql" style="--c:'+C[t[2]].c+'" href="'+t[1]+'" target="_blank" rel="noopener"><i></i>'+t[0]+'</a>').join("")
+    + '</div></div>';
+
+  /* navigation tiles */
+  h += '<div class="block"><p class="eyebrow">Everything else</p><h2 class="section">Your pages</h2><div class="tiles">'
+    + TILES.map(t=>{
+        const n = t[0]==="exams" ? allItems().filter(i=>i.type==="Exam").length+" exams"
+                : t[0]==="grades" ? COURSES.length+" courses"
+                : t[0]==="schedule" ? MEETINGS.length+" meetings"
+                : allItems().length+" items";
+        return '<button class="tile" data-goto="'+t[0]+'"><b>'+t[1]+'</b><span>'+t[2]+'</span><span class="k">'+n+'</span></button>';
+      }).join("")
+    + COURSES.map(c=>{
+        const its=allItems().filter(i=>i.course===c.id);
+        const open=its.filter(i=>itemStatus(i)!=="Done").length;
+        return '<button class="tile" style="--c:'+c.c+'" data-goto="'+c.id+'"><b>'+c.code+'</b>'
+          + '<span>'+esc(c.name)+'</span><span class="k">'+open+' open · '+its.length+' total</span></button>';
+      }).join("")
+    + '</div></div>';
+
+  /* folded detail sections */
+  h += '<div class="block"><p class="eyebrow">Reference</p><h2 class="section">Tucked away</h2>'
+
+    + '<details class="fold" open><summary>This week, hour by hour<span>weekly grid</span></summary>'
+    + '<div class="inner"><div class="gridscroll"><div id="gridA"></div></div></div></details>'
+
+    + '<details class="fold"><summary>Courses &amp; instructors<span>'+COURSES.length+' courses</span></summary>'
+    + '<div class="inner"><div class="cards" id="courseCards"></div></div></details>'
+
+    + '<details class="fold"><summary>Semester milestones<span>'+MILESTONES.length+' dates</span></summary>'
+    + '<div class="inner"><ul class="miles" id="miles"></ul></div></details>'
+
+    + '<details class="fold"><summary>Getting around campus<span>'+BUILDINGS.length+' buildings</span></summary>'
+    + '<div class="inner"><div class="legend" id="legend"></div>'
+    + '<h3 style="font-family:var(--serif);font-size:16px;margin:20px 0 6px;font-weight:600">Back-to-back transitions</h3>'
+    + '<ul class="hops" id="hops"></ul>'
+    + '<h3 style="font-family:var(--serif);font-size:16px;margin:20px 0 8px;font-weight:600">Campus map</h3>'
+    + '<div id="mapZone"><div class="drop" id="drop">'
+    + '<p>Drop a campus map image here, or choose a file. It saves with the rest of your page.</p>'
+    + '<input type="file" id="mapInput" accept="image/*"></div></div>'
+    + '<p class="savenote" id="mapNote"></p></div></details>'
+
+    + '<details class="fold"><summary>Every assignment, raw and editable<span>'+allItems().length+' rows</span></summary>'
+    + '<div class="inner" id="rawWrap"></div></details>'
+    + '</div>';
+
+  host.innerHTML=h;
+
+  renderGrid(document.getElementById("gridA"));
+
+  document.getElementById("courseCards").innerHTML = COURSES.map(c=>`
+    <article class="card ccard" style="--c:${c.c}">
+      <div class="code">${c.code} · ${c.credits}</div>
+      <h3>${c.name}</h3>
+      <dl>
+        <dt>Meets</dt><dd>${c.meets}</dd>
+        <dt>Prof</dt><dd>${c.instructor}</dd>
+        <dt>Email</dt><dd>${c.email}</dd>
+        <dt>Hours</dt><dd>${c.hours}</dd>
+      </dl>
+    </article>`).join("");
+
+  document.getElementById("miles").innerHTML = MILESTONES.map(([d,t])=>
+    `<li><span class="dt">${d}</span><span>${t}</span></li>`).join("");
+  document.getElementById("legend").innerHTML = BUILDINGS.map(([code,desc])=>
+    `<div><code>${code}</code><span>${desc}</span></div>`).join("");
+  document.getElementById("hops").innerHTML = HOPS.map(([when,route,gap,tight])=>
+    `<li><span class="when">${when}</span><span>${route}</span><span class="gap ${tight?"tight":""}">${gap}</span></li>`).join("");
+
+  const raw=document.getElementById("rawWrap");
+  raw.innerHTML = table(allItems().filter(i=>i.due).sort((a,b)=>a.due<b.due?-1:1));
+
+  host.querySelectorAll("[data-goto]").forEach(b=>{ b.onclick=()=>goTab(b.dataset.goto); });
+  wireRows(host);
+  wireICS(host);
+  setupMap();
+
+  const twc = document.getElementById("toggleWeekClasses");
+  if(twc) twc.onclick=()=>{
+    const body = document.getElementById("weekClassesBody");
+    const show = body.style.display==="none";
+    body.style.display = show ? "block" : "none";
+    twc.textContent = show ? "Hide rest of week" : "Show rest of week";
+  };
+  const twd = document.getElementById("toggleWeekDue");
+  if(twd) twd.onclick=()=>{
+    const body = document.getElementById("weekDueBody");
+    const show = body.style.display==="none";
+    body.style.display = show ? "block" : "none";
+    twd.textContent = show ? "Hide due this week" : "Show due this week";
+  };
+}
+
+function goTab(id){
+  activeTab=id;
+  switchPage("tracker");
+  buildTabs();
+  renderTracker();
+}
+
+function setupMap(){
+  const zone=document.getElementById("mapZone"), drop=document.getElementById("drop"),
+        input=document.getElementById("mapInput"), note=document.getElementById("mapNote");
+  function show(url){
+    zone.innerHTML='<img id="mapImg" src="'+url+'" alt="Campus map">'+
+      '<div style="margin-top:10px"><button class="btn" id="mapClear">Remove map</button></div>';
+    document.getElementById("mapClear").onclick=()=>{ state.map=null; save(); setupMap(); note.textContent="Map removed."; };
+  }
+  if(state.map){ show(state.map); return; }
+  function handle(file){
+    if(!file || !file.type.startsWith("image/")){ note.textContent="That file isn't an image."; return; }
+    const fr=new FileReader();
+    fr.onload=()=>{
+      const url=fr.result;
+      if(url.length > 3_500_000){
+        show(url);
+        note.textContent="Showing your map, but it's too large to store — it will disappear on reload. Try a smaller image.";
+        return;
+      }
+      state.map=url; save(); show(url); note.textContent="Map saved.";
+    };
+    fr.readAsDataURL(file);
+  }
+  input.onchange=e=>handle(e.target.files[0]);
+  ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over")}));
+  ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over")}));
+  drop.addEventListener("drop",e=>handle(e.dataTransfer.files[0]));
+}
+
+/* ============================================================
+   7. Assignment tracker
+   ============================================================ */
+let activeTab = "overview";
+
+function buildTabs(){
+  const tabs=[{id:"overview",label:"Overview"},{id:"calendar",label:"Calendar"},{id:"exams",label:"Exams"},{id:"grades",label:"Grades & absences"},{id:"schedule",label:"Schedule"}]
+    .concat(COURSES.map(c=>({id:c.id,label:c.short,color:c.c})));
+  document.getElementById("trackerTabs").innerHTML = tabs.map(t=>{
+    let cnt="";
+    if(C[t.id]){
+      const items=allItems().filter(i=>i.course===t.id);
+      const done=items.filter(i=>itemStatus(i)==="Done").length;
+      cnt = '<span class="cnt">'+done+"/"+items.length+'</span>';
+    }
+    return '<button role="tab" data-tab="'+t.id+'" aria-selected="'+(activeTab===t.id)+'">'
+      + (t.color?'<span class="dot" style="background:'+t.color+'"></span>':"")
+      + t.label + cnt + '</button>';
+  }).join("");
+  document.querySelectorAll("#trackerTabs button").forEach(b=>{
+    b.onclick=()=>{ activeTab=b.dataset.tab; buildTabs(); renderTracker(); window.scrollTo({top:0,behavior:"instant"}); };
+  });
+}
+
+/* ---- filters ---- */
+const F = { q:"", type:"All types", status:"Any status", hideDone:false };
+function filterOn(){ return F.q || F.type!=="All types" || F.status!=="Any status" || F.hideDone; }
+function keep(it){
+  if(F.hideDone && itemStatus(it)==="Done") return false;
+  if(F.status!=="Any status" && itemStatus(it)!==F.status) return false;
+  if(F.type!=="All types" && it.type!==F.type) return false;
+  if(F.q){
+    const hay=(it.title+" "+it.type+" "+(it.note||"")+" "+C[it.course].code+" "+itemNotes(it)).toLowerCase();
+    if(!hay.includes(F.q.toLowerCase())) return false;
+  }
+  return true;
+}
+function applyF(list){ return list.filter(keep); }
+
+function setupToolbar(){
+  const types=[...new Set(allItems().map(i=>i.type))].sort();
+  const ts=document.getElementById("ftype");
+  ts.innerHTML='<option>All types</option>'+types.map(t=>'<option'+(t===F.type?" selected":"")+'>'+esc(t)+'</option>').join("");
+  const q=document.getElementById("fq"), st=document.getElementById("fstat"),
+        hd=document.getElementById("fhide"), cl=document.getElementById("fclear");
+  q.value=F.q; st.value=F.status; hd.checked=F.hideDone;
+  q.oninput=()=>{ F.q=q.value; renderTracker(); };
+  ts.onchange=()=>{ F.type=ts.value; renderTracker(); };
+  st.onchange=()=>{ F.status=st.value; renderTracker(); };
+  hd.onchange=()=>{ F.hideDone=hd.checked; renderTracker(); };
+  cl.onclick=()=>{ F.q=""; F.type="All types"; F.status="Any status"; F.hideDone=false; setupToolbar(); renderTracker(); };
+  document.getElementById("printBtn").onclick=()=>window.print();
+  document.getElementById("icsBtn").onclick=()=>{ const sc=icsScope("filtered"); downloadICS(sc.items,sc.name,sc.file); };
+}
+function updateToolbar(){
+  const cl=document.getElementById("fclear"), cn=document.getElementById("fcount"),
+        tb=document.querySelector(".toolbar");
+  const shown=applyF(allItems()).length, total=allItems().length;
+  cl.hidden=!filterOn();
+  tb.classList.toggle("filtered",filterOn());
+  cn.textContent = filterOn() ? shown+" of "+total+" shown" : total+" items";
+}
+
+function renderTracker(){
+  const host=document.getElementById("trackerBody");
+  if(activeTab==="overview") host.innerHTML=overviewHTML();
+  else if(activeTab==="calendar"){ host.innerHTML=calendarShell(); renderCalendar(); }
+  else if(activeTab==="schedule") host.innerHTML=scheduleHTML();
+  else if(activeTab==="exams") host.innerHTML=examsHTML();
+  else if(activeTab==="grades") host.innerHTML=gradesHTML();
+  else host.innerHTML=courseHTML(C[activeTab]);
+
+  if(activeTab==="schedule") renderGrid(document.getElementById("gridB"));
+  wireRows(host);
+  wireAdd(host);
+  wireICS(host);
+  updateToolbar();
+}
+
+/* ---- overview ---- */
+function overviewHTML(){
+  const t=today();
+  const items=allItems().filter(i=>i.due);
+  const open=items.filter(i=>itemStatus(i)!=="Done");
+  const overdue=applyF(open.filter(i=>parseD(i.due)<t));
+  const soon=applyF(open.filter(i=>{const d=daysBetween(t,parseD(i.due)); return d>=0 && d<=13;}));
+  const exams=open.filter(i=>i.type==="Exam" && parseD(i.due)>=t).sort((a,b)=>a.due<b.due?-1:1);
+  const doneCount=allItems().filter(i=>itemStatus(i)==="Done").length;
+
+  const openAll=applyF(allItems().filter(i=>itemStatus(i)!=="Done"));
+  const U=k=>openAll.filter(i=>urgency(i).k===k).length;
+  let h = '<p class="eyebrow">How urgent things are right now</p>'
+    + '<div class="urgstrip">'
+    + ubox(U("overdue"),"Overdue","l0") + ubox(U("today"),"Due today","l1")
+    + ubox(U("tomorrow"),"Tomorrow","l2") + ubox(U("soon"),"Within 3 days","")
+    + ubox(U("week"),"This week","") + ubox(U("two"),"Within 2 weeks","")
+    + '</div>'
+    + '<div class="statgrid">'
+    + stat(soon.length,"due in 14 days")
+    + stat(overdue.length,"past due",overdue.length>0)
+    + stat(exams.length,"exams left")
+    + stat(doneCount+" / "+allItems().length,"marked done")
+    + '</div>';
+
+  if(exams[0]){
+    const d=parseD(exams[0].due);
+    h += '<div class="callout"><b>Next exam:</b> '+esc(exams[0].title)+' — '+C[exams[0].course].code
+       + ' on '+fmtLong(d)+' ('+relative(d)+')'+(exams[0].time?' at '+esc(exams[0].time):'')+'.</div>';
+  }
+
+  if(overdue.length){
+    h += '<h3 style="font-family:var(--serif);font-size:19px;margin:26px 0 8px;color:var(--red)">Past due ('+overdue.length+')</h3>'
+      + table(overdue.sort((a,b)=>a.due<b.due?-1:1));
+  }
+
+  h += '<h3 style="font-family:var(--serif);font-size:19px;margin:28px 0 10px">The next two weeks</h3>';
+  if(!soon.length){ h += '<div class="card emptystate">Nothing due in the next 14 days. Check the calendar tab for what\'s further out.</div>'; }
+  else{
+    const groups={};
+    soon.forEach(i=>{ (groups[i.due]=groups[i.due]||[]).push(i); });
+    Object.keys(groups).sort().forEach(k=>{
+      const d=parseD(k), isToday=daysBetween(t,d)===0;
+      h += '<div class="daygroup"><div class="dayhead '+(isToday?"is-today":"")+'"><h4>'+fmtLong(d)+'</h4>'
+        + '<span class="rel">'+relative(d)+'</span></div>'
+        + table(groups[k],true) + '</div>';
+    });
+  }
+
+  h += '<h3 style="font-family:var(--serif);font-size:19px;margin:30px 0 10px">Put this in Apple Calendar</h3>'
+    + '<div class="card" style="padding:14px 16px">'
+    + '<p style="margin:0 0 4px;font-size:13.5px;color:var(--ink-2)">Downloads a .ics file. On iPhone, tap it and choose a calendar; on a Mac, double-click it. Exams come with alerts 2 days and 2 hours ahead; nightly deadlines alert at noon that day.</p>'
+    + '<div class="icsbar">'
+    + '<button class="btn" data-ics="all">Everything (' + allItems().filter(i=>i.due).length + ' events)</button>'
+    + '<button class="btn" data-ics="exams">Exams only</button>'
+    + '<button class="btn" data-ics="30">Next 30 days</button>'
+    + '</div></div>';
+
+  h += '<h3 style="font-family:var(--serif);font-size:19px;margin:30px 0 10px">Progress by course</h3><div class="card" style="padding:12px 15px">';
+  COURSES.forEach(c=>{
+    const its=allItems().filter(i=>i.course===c.id);
+    const dn=its.filter(i=>itemStatus(i)==="Done").length;
+    const pct=its.length?Math.round(dn/its.length*100):0;
+    h += '<div class="progrow"><span>'+c.code+'</span><span class="bar" style="--c:'+c.c+'"><i style="width:'+pct+'%"></i></span>'
+       + '<span class="pct">'+dn+"/"+its.length+'</span></div>';
+  });
+  h += '</div>';
+  return h;
+}
+function ubox(v,l,cls){ return '<div class="ubox '+cls+'"><b>'+v+'</b><span>'+l+'</span></div>'; }
+function stat(v,l,alarm){ return '<div class="card stat'+(alarm?" alarm":"")+'"><b>'+v+'</b><span>'+l+'</span></div>'; }
+
+/* ---- exams tab ---- */
+function examsHTML(){
+  const exams=applyF(allItems().filter(i=>i.type==="Exam")).sort((a,b)=>(a.due||"9999")<(b.due||"9999")?-1:1);
+  const taken=exams.filter(i=>itemStatus(i)==="Done").length;
+  let h='<p class="eyebrow">Every exam in one place</p><h2 class="section">Exams &amp; finals</h2>'
+    + '<p class="section-note">Mark each one as you take it and record your score. '+taken+' of '+exams.length+' taken so far.</p>';
+  if(!exams.length) return h+'<div class="card emptystate">No exams match your current filters.</div>';
+
+  h += '<div class="icsbar"><button class="btn" data-ics="exams">Add exams to Apple Calendar</button></div><div style="height:16px"></div>';
+  h += '<div class="examgrid">';
+  exams.forEach(it=>{
+    const c=C[it.course], u=urgency(it), st=itemStatus(it), d=it.due?parseD(it.due):null;
+    h += '<article class="card examcard arow '+(st==="Done"?"done":"")+'" style="--c:'+c.c+'" data-id="'+it.id+'">'
+      + '<div class="when">'+c.code+' · '+esc(it.weight||"")+'</div>'
+      + '<h4>'+esc(it.title)+'</h4>'
+      + '<div class="big">'+(d?fmtLong(d):"Date TBA")+'</div>'
+      + '<div class="when">'+esc(it.time||"")+'</div>'
+      + '<div style="margin-top:7px"><span class="urg '+u.k+'">'+u.label+'</span></div>'
+      + (it.note?'<p class="cover">'+esc(it.note)+'</p>':'')
+      + '<div class="ctl">'
+        + '<select class="status" data-k="status" data-v="'+st+'">'
+        + [["Not Started","Not studied yet"],["In Progress","Studying"],["Done","Taken"]]
+            .map(o=>'<option value="'+o[0]+'"'+(o[0]===st?" selected":"")+'>'+o[1]+'</option>').join("")
+        + '</select>'
+        + '<input class="score" data-k="score" placeholder="my score" value="'+esc(edit(it.id).score||"")+'">'
+      + '</div>'
+      + '<div style="margin-top:9px"><textarea class="notes" data-k="notes" rows="1" placeholder="Study notes, room number…">'+esc(itemNotes(it))+'</textarea></div>'
+      + '</article>';
+  });
+  return h+'</div>';
+}
+
+/* ---- grades & absences tab ---- */
+function gradesHTML(){
+  let h='<p class="eyebrow">What counts, and what happens if you miss</p>'
+    + '<h2 class="section">Grading &amp; absence policies</h2>'
+    + '<p class="section-note">Pulled straight from each syllabus. Weights on the left, the rules that bite on the right.</p>';
+  COURSES.forEach(c=>{
+    const r=RULES[c.id]||{};
+    h += '<article class="card gradeblock" style="--c:'+c.c+'">'
+      + '<h3>'+c.code+' — '+esc(c.name)+'</h3>'
+      + '<div class="sub">'+esc(c.instructor)+' · '+c.credits+'</div>';
+    if(c.grading.length){
+      h += '<table><tbody>'+c.grading.map(g=>'<tr><td>'+esc(g[0])+'</td><td>'+esc(g[1])+'</td></tr>').join("")+'</tbody></table>';
+    }
+    h += '<div class="pbox">';
+    if(r.absence) h += '<h5>Attendance &amp; absences</h5><p>'+esc(r.absence)+'</p>';
+    if(r.late)    h += '<h5>Late work</h5><p>'+esc(r.late)+'</p>';
+    if(r.ai)      h += '<h5>AI policy</h5><p>'+esc(r.ai)+'</p>';
+    h += '</div></article>';
+  });
+  return h;
+}
+
+/* ---- shared item table ---- */
+function table(items,hideDate){
+  return '<div class="card tablewrap"><table class="data"><thead><tr>'
+    + (hideDate?"":"<th>Due</th>")
+    + '<th>Assignment</th><th>Course</th><th>Weight</th><th>Status</th><th>Priority</th><th style="min-width:170px">Notes</th>'
+    + '</tr></thead><tbody>'
+    + items.map(i=>row(i,hideDate)).join("")
+    + '</tbody></table></div>';
+}
+function row(it,hideDate){
+  const st=itemStatus(it), c=C[it.course], d=it.due?parseD(it.due):null;
+  const over = d && d<today() && st!=="Done";
+  const u=urgency(it);
+  let due = '<td class="duecell">';
+  if(d) due += '<b>'+fmtShort(d)+'</b><span>'+(it.time||DOW[d.getDay()].slice(0,3))+'</span>';
+  else due += '<b>TBA</b><span>no date yet</span>';
+  due += '<br><span class="urg '+u.k+'">'+u.label+'</span></td>';
+  return '<tr class="arow '+(st==="Done"?"done":"")+' '+(over?"overdue":"")+' '+(isCritical(it)?"crit":"")+'" data-id="'+it.id+'">'
+    + (hideDate?"":due)
+    + '<td><div class="atitle">'+esc(it.title)+'</div>'
+      + '<div class="ameta">'+esc(it.type)+(it.time&&hideDate?" · "+esc(it.time):"")+'</div>'
+      + (hideDate?'<span class="urg '+u.k+'">'+u.label+'</span>':'')
+      + (it.note?'<div style="font-size:12px;color:var(--ink-2);margin-top:4px;max-width:44ch">'+esc(it.note)+'</div>':'')
+    + '</td>'
+    + '<td><span class="tagpill '+(it.type==="Exam"?"exam":"")+'" style="border-color:'+c.c+'55;background:'+c.tint+'">'+c.code+'</span></td>'
+    + '<td style="font-size:12px;color:var(--ink-2)">'+esc(it.weight||"—")+'</td>'
+    + '<td><select class="status" data-k="status" data-v="'+st+'">'
+      + ["Not Started","In Progress","Done"].map(o=>'<option'+(o===st?" selected":"")+'>'+o+'</option>').join("")
+      + '</select>'
+      + (it.type==="Exam"?'<br><input class="score" data-k="score" placeholder="score" value="'+esc(edit(it.id).score||"")+'">':'')
+      + '</td>'
+    + '<td><select class="prio" data-k="prio" data-v="'+itemPrio(it)+'">'
+      + ["Low","Medium","High"].map(o=>'<option'+(o===itemPrio(it)?" selected":"")+'>'+o+'</option>').join("")
+      + '</select></td>'
+    + '<td><textarea class="notes" data-k="notes" rows="1" placeholder="Add a note…">'+esc(itemNotes(it))+'</textarea></td>'
+    + '</tr>';
+}
+function wireRows(host){
+  host.querySelectorAll(".arow").forEach(tr=>{
+    const id=tr.dataset.id;
+    tr.querySelectorAll("select,textarea").forEach(el=>{
+      const k=el.dataset.k;
+      const handler=()=>{
+        setEdit(id,k,el.value);
+        if(el.tagName==="SELECT") el.dataset.v=el.value;
+        if(k==="status"){
+          tr.classList.toggle("done", el.value==="Done");
+          buildTabs();
+          if(!document.getElementById("page-command").hidden){ buildCommand(); }
+          else if(activeTab==="overview"||activeTab==="exams") renderTracker();
+        }
+      };
+      el.addEventListener("change",handler);
+      if(el.tagName==="TEXTAREA") el.addEventListener("input",()=>setEdit(id,"notes",el.value));
+    });
+  });
+}
+
+/* ---- per-course ---- */
+function courseHTML(c){
+  const items=applyF(allItems().filter(i=>i.course===c.id))
+    .sort((a,b)=>(a.due||"9999")<(b.due||"9999")?-1:1);
+  let h='<p class="eyebrow">'+c.code+' · '+c.credits+'</p><h2 class="section">'+c.name+'</h2>'
+    + '<p class="section-note">'+c.meets+' · '+c.instructor+(c.email!=="—"?" · "+c.email:"")+'</p>';
+
+  if(c.needsSyllabus){
+    h += '<div class="callout">No syllabus for this one yet. Send it over and I\'ll fill in the real due dates, grading breakdown and policies. '
+       + 'In the meantime you can add items yourself below.</div>';
+  }
+  if(c.grading.length){
+    h += '<h3 style="font-family:var(--serif);font-size:17px;margin:22px 0 8px;font-weight:600">Grade breakdown</h3>'
+      + '<div class="card tablewrap"><table class="data"><tbody>'
+      + c.grading.map(([a,b])=>'<tr><td style="font-weight:600">'+a+'</td><td style="text-align:right;font-family:var(--mono);font-size:12px">'+b+'</td></tr>').join("")
+      + '</tbody></table></div>';
+  }
+  if(c.policies.length){
+    h += '<h3 style="font-family:var(--serif);font-size:17px;margin:22px 0 8px;font-weight:600">Policies worth remembering</h3>'
+      + '<div class="card" style="padding:14px 16px"><ul class="policy">'+c.policies.map(p=>'<li>'+esc(p)+'</li>').join("")+'</ul></div>';
+  }
+  if(c.schedule){
+    h += '<h3 style="font-family:var(--serif);font-size:17px;margin:22px 0 8px;font-weight:600">'+esc(c.schedule.title)+'</h3>'
+      + '<div class="card tablewrap"><table class="data"><thead><tr>'
+      + c.schedule.head.map(x=>'<th>'+esc(x)+'</th>').join("")
+      + '</tr></thead><tbody>'
+      + c.schedule.rows.map(r=>'<tr>'+r.map((x,i)=>'<td'+(i===0?' style="white-space:nowrap;font-family:var(--mono);font-size:11.5px;color:var(--ink-3)"':i===3?' style="font-family:var(--mono);font-size:11.5px;color:var(--ink-2);white-space:nowrap"':'')+'>'+esc(x)+'</td>').join("")+'</tr>').join("")
+      + '</tbody></table></div>';
+  }
+  h += '<h3 style="font-family:var(--serif);font-size:17px;margin:26px 0 8px;font-weight:600">Assignments and exams ('+items.length+')</h3>';
+  h += items.length? table(items) : '<div class="card emptystate">Nothing here yet — add your first item below.</div>';
+  h += addBarHTML(c.id);
+  h += '<div class="icsbar" style="margin-top:16px"><button class="btn" data-ics="'+c.id+'">Add '+c.code+' to Apple Calendar</button></div>';
+  return h;
+}
+function addBarHTML(courseId){
+  return '<div class="addbar" data-course="'+courseId+'">'
+    + '<input type="text" class="add-title" placeholder="Add an assignment…">'
+    + '<input type="date" class="add-date">'
+    + '<button class="btn add-go">Add</button></div>';
+}
+function wireAdd(host){
+  const bar=host.querySelector(".addbar"); if(!bar) return;
+  const go=()=>{
+    const t=bar.querySelector(".add-title").value.trim();
+    if(!t){ bar.querySelector(".add-title").focus(); return; }
+    state.custom.push({id:"cu-"+Date.now(),course:bar.dataset.course,title:t,type:"Added by you",
+      due:bar.querySelector(".add-date").value||null,time:"",weight:"—",note:"",prio:"Medium"});
+    save(); buildTabs(); renderTracker(); toast("Added");
+  };
+  bar.querySelector(".add-go").onclick=go;
+  bar.querySelector(".add-title").addEventListener("keydown",e=>{ if(e.key==="Enter") go(); });
+}
+
+/* ---- schedule tab ---- */
+function scheduleHTML(){
+  return '<p class="eyebrow">Same grid as the Command Center</p><h2 class="section">Weekly class schedule</h2>'
+    + '<p class="section-note">Today\'s column is shaded and the red line follows the clock.</p>'
+    + '<div class="gridscroll"><div id="gridB"></div></div>'
+    + '<div class="card tablewrap" style="margin-top:20px"><table class="data"><thead><tr>'
+    + '<th>Course</th><th>Type</th><th>Days</th><th>Time</th><th>Room</th><th>Instructor</th></tr></thead><tbody>'
+    + [["MA 16500","Lecture","MWF","1:30–2:20 PM","CL50 224","K. Matsuki","ma165"],
+       ["MA 16500","Recitation","R","8:30–9:20 AM","SCHM 309","K. Matsuki","ma165"],
+       ["CHM 11510","Lecture","TR","9:30–10:20 AM","WTHR 200","G. J. Simpson","chm11510"],
+       ["CHM 11510","Recitation","R","4:30–5:20 PM","BRWN 3102","G. J. Simpson","chm11510"],
+       ["CHM 11520","Lab","W","7:30–10:20 AM","CHAS 1038","J. C. Rienstra-Kiracofe","chm11520"],
+       ["ACCT 20000","Lecture","MWF","12:30–1:20 PM","FRNY G140","T. D. Maienbrook","acct200"],
+       ["SCLA 10200","Lecture","TR","3:00–4:15 PM","PAO B157","G. B. Jouin","scla102"],
+       ["ENGL 10800","Lecture","TR","12:00–1:15 PM","SCHM 227","J. A. Weatherford","engl108"]
+      ].map(r=>'<tr><td><span class="tagpill" style="background:'+C[r[6]].tint+';border-color:'+C[r[6]].c+'55">'+r[0]+'</span></td>'
+      + '<td>'+r[1]+'</td><td style="font-family:var(--mono);font-size:12px">'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5]+'</td></tr>').join("")
+    + '</tbody></table></div>';
+}
+
+/* ---- calendar ---- */
+let calMode="month", calAnchor=today();
+function calendarShell(){
+  return '<div class="calbar">'
+    + '<button class="btn" id="calPrev" aria-label="Previous">‹</button>'
+    + '<button class="btn" id="calNext" aria-label="Next">›</button>'
+    + '<button class="btn" id="calToday">Today</button>'
+    + '<span class="title" id="calTitle"></span>'
+    + '<span style="margin-left:auto;display:flex;gap:4px">'
+    + '<button class="btn" data-mode="day">Day</button>'
+    + '<button class="btn" data-mode="week">Week</button>'
+    + '<button class="btn" data-mode="month">Month</button></span></div>'
+    + '<div id="calView"></div>';
+}
+function renderCalendar(){
+  const byDate={};
+  applyF(allItems().filter(i=>i.due)).forEach(i=>{ (byDate[i.due]=byDate[i.due]||[]).push(i); });
+  const view=document.getElementById("calView"), title=document.getElementById("calTitle");
+  document.querySelectorAll("[data-mode]").forEach(b=>{
+    b.setAttribute("aria-pressed", b.dataset.mode===calMode);
+    b.onclick=()=>{ calMode=b.dataset.mode; renderCalendar(); };
+  });
+  document.getElementById("calPrev").onclick=()=>{ shift(-1); renderCalendar(); };
+  document.getElementById("calNext").onclick=()=>{ shift(1); renderCalendar(); };
+  document.getElementById("calToday").onclick=()=>{ calAnchor=today(); renderCalendar(); };
+
+  if(calMode==="month"){
+    title.textContent = MON[calAnchor.getMonth()]+" "+calAnchor.getFullYear();
+    view.innerHTML = monthHTML(byDate);
+  } else if(calMode==="week"){
+    const s=weekStart(calAnchor), e=new Date(s); e.setDate(e.getDate()+6);
+    title.textContent = fmtShort(s)+" – "+fmtShort(e);
+    view.innerHTML = rangeHTML(s,7,byDate);
+  } else {
+    title.textContent = fmtLong(calAnchor);
+    view.innerHTML = rangeHTML(calAnchor,1,byDate);
+  }
+  wireRows(view);
+}
+function shift(n){
+  const d=new Date(calAnchor);
+  if(calMode==="month") d.setMonth(d.getMonth()+n);
+  else if(calMode==="week") d.setDate(d.getDate()+7*n);
+  else d.setDate(d.getDate()+n);
+  calAnchor=d;
+}
+function weekStart(d){ const s=new Date(d); s.setDate(s.getDate()-s.getDay()); return s; }
+function monthHTML(byDate){
+  const first=new Date(calAnchor.getFullYear(),calAnchor.getMonth(),1);
+  const start=weekStart(first);
+  let h='<div class="month">'+["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>'<div class="dow">'+d+'</div>').join("");
+  for(let i=0;i<42;i++){
+    const d=new Date(start); d.setDate(d.getDate()+i);
+    const out=d.getMonth()!==calAnchor.getMonth();
+    const isT=key(d)===key(today());
+    const items=(byDate[key(d)]||[]);
+    let chips=items.slice(0,3).map(it=>{
+      const c=C[it.course];
+      return '<span class="chip '+(itemStatus(it)==="Done"?"done":"")+'" style="--c:'+c.c+';--tint:'+c.tint+'" title="'+esc(it.title)+'">'+esc(short(it))+'</span>';
+    }).join("");
+    if(items.length>3) chips += '<span class="more">+'+(items.length-3)+' more</span>';
+    const hol = HOLIDAYS[key(d)];
+    const holChip = hol ? '<span class="holiday">'+esc(hol)+'</span>' : '';
+    h += '<div class="mcell '+(out?"out":"")+' '+(isT?"today":"")+' '+(hol?"holiday-cell":"")+'"><span class="dnum">'+d.getDate()+'</span>'+holChip+chips+'</div>';
+    if(i>=34 && new Date(start.getFullYear(),start.getMonth(),start.getDate()+i+1).getMonth()!==calAnchor.getMonth()) break;
+  }
+  return h+'</div>';
+}
+function short(it){
+  const c=C[it.course].code.split(" ")[0];
+  return c+" · "+(it.title.length>26?it.title.slice(0,26)+"…":it.title);
+}
+function rangeHTML(start,n,byDate){
+  let h='<div class="daylist">';
+  for(let i=0;i<n;i++){
+    const d=new Date(start); d.setDate(d.getDate()+i);
+    const items=(byDate[key(d)]||[]).sort((a,b)=>C[a.course].code<C[b.course].code?-1:1);
+    const isT=key(d)===key(today());
+    h += '<div class="daygroup"><div class="dayhead '+(isT?"is-today":"")+'"><h4>'+fmtLong(d)+'</h4>'
+       + '<span class="rel">'+relative(d)+'</span></div>';
+    if(HOLIDAYS[key(d)]) h += '<div class="callout" style="margin:8px 0 4px">'+esc(HOLIDAYS[key(d)])+'</div>';
+    const classes = HOLIDAYS[key(d)] && /no classes/i.test(HOLIDAYS[key(d)]) ? [] : MEETINGS.filter(m=>m.d===d.getDay());
+    if(classes.length){
+      h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">'
+        + classes.sort((a,b)=>mins(a.s)-mins(b.s)).map(m=>'<span class="tagpill" style="background:'+C[m.c].tint+';border-color:'+C[m.c].c+'55">'
+          + m.label+" "+fmtTime(m.s)+" · "+m.room+'</span>').join("")
+        + '</div>';
+    }
+    h += items.length ? table(items,true) : '<div class="empty">Nothing due.</div>';
+    h += '</div>';
+  }
+  return h+'</div>';
+}
+
+/* ============================================================
+   7b. Apple Calendar (.ics) export
+   ============================================================ */
+function icsFold(line){
+  if(line.length<=74) return line;
+  let out=line.slice(0,74), rest=line.slice(74);
+  while(rest.length>73){ out+="\r\n "+rest.slice(0,73); rest=rest.slice(73); }
+  return out+"\r\n "+rest;
+}
+function icsEsc(t){ return String(t==null?"":t).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n"); }
+function p2(n){ return String(n).padStart(2,"0"); }
+function icsDay(ymd){ return ymd.replace(/-/g,""); }
+function icsStamp(ymd,h,m){ return icsDay(ymd)+"T"+p2(h)+p2(m)+"00"; }
+function icsAlarm(trigger,text){
+  return ["BEGIN:VALARM","ACTION:DISPLAY","TRIGGER:"+trigger,"DESCRIPTION:"+icsEsc(text),"END:VALARM"];
+}
+function icsEvent(it,stampNow){
+  if(!it.due) return [];
+  const c=C[it.course];
+  const isExam=it.type==="Exam";
+  const title=(isExam?"EXAM — ":"")+c.code+": "+it.title;
+  const desc=[
+    it.type, it.weight?"Worth: "+it.weight:"", it.time?"When: "+it.time:"",
+    "Instructor: "+c.instructor, it.note||""
+  ].filter(Boolean).join("\n");
+
+  let dt=[], alarms=[];
+  const range=(it.time||"").match(/(\d{1,2}):(\d{2})\s*[\u2013\u2014-]\s*(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if(range){
+    let sh=+range[1], eh=+range[3]; const ap=range[5].toUpperCase();
+    if(ap==="PM"){ if(sh<12) sh+=12; if(eh<12) eh+=12; } else { if(sh===12) sh=0; if(eh===12) eh=0; }
+    dt=["DTSTART:"+icsStamp(it.due,sh,+range[2]),"DTEND:"+icsStamp(it.due,eh,+range[4])];
+    alarms=icsAlarm("-P2D","In 2 days: "+title).concat(icsAlarm("-PT2H","Starting soon: "+title));
+  } else if(/11:59\s*PM/i.test(it.time||"")){
+    dt=["DTSTART:"+icsStamp(it.due,23,0),"DTEND:"+icsStamp(it.due,23,59)];
+    alarms=icsAlarm("-PT11H","Due tonight: "+title);
+  } else {
+    const end=new Date(parseD(it.due)); end.setDate(end.getDate()+1);
+    dt=["DTSTART;VALUE=DATE:"+icsDay(it.due),"DTEND;VALUE=DATE:"+icsDay(key(end))];
+    alarms=icsAlarm("-PT9H","Due today: "+title);
+  }
+  return ["BEGIN:VEVENT","UID:"+it.id+"-fall2026@purdue.local","DTSTAMP:"+stampNow]
+    .concat(dt)
+    .concat([
+      "SUMMARY:"+icsEsc(title),
+      "DESCRIPTION:"+icsEsc(desc),
+      "CATEGORIES:"+icsEsc(c.code),
+      isExam?"PRIORITY:1":"PRIORITY:5",
+      "TRANSP:TRANSPARENT"
+    ])
+    .concat(alarms)
+    .concat(["END:VEVENT"]);
+}
+function buildICS(items,calName){
+  const n=new Date();
+  const stampNow=n.getUTCFullYear()+p2(n.getUTCMonth()+1)+p2(n.getUTCDate())+"T"
+    +p2(n.getUTCHours())+p2(n.getUTCMinutes())+p2(n.getUTCSeconds())+"Z";
+  let lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Fall 2026 Command Center//EN",
+    "CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:"+icsEsc(calName),
+    "X-WR-TIMEZONE:America/Indiana/Indianapolis"];
+  items.filter(i=>i.due).forEach(i=>{ lines=lines.concat(icsEvent(i,stampNow)); });
+  lines.push("END:VCALENDAR");
+  return lines.map(icsFold).join("\r\n")+"\r\n";
+}
+function downloadICS(items,calName,filename){
+  const withDates=items.filter(i=>i.due);
+  if(!withDates.length){ toast("Nothing with a date to export"); return; }
+  try{
+    const blob=new Blob([buildICS(withDates,calName)],{type:"text/calendar;charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url; a.download=filename+".ics"; a.style.display="none";
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); },1500);
+    toast(withDates.length+" events exported");
+  }catch(e){ toast("Export failed — try the desktop app"); }
+}
+function icsScope(scope){
+  const all=allItems();
+  if(scope==="exams") return {items:all.filter(i=>i.type==="Exam"),name:"Fall 2026 Exams",file:"fall-2026-exams"};
+  if(scope==="filtered") return {items:applyF(all),name:"Fall 2026 Coursework",file:"fall-2026-coursework"};
+  if(scope==="30"){
+    const t=today();
+    return {items:all.filter(i=>i.due&&daysBetween(t,parseD(i.due))>=-1&&daysBetween(t,parseD(i.due))<=30),
+      name:"Fall 2026 — Next 30 Days",file:"fall-2026-next-30-days"};
+  }
+  if(C[scope]) return {items:all.filter(i=>i.course===scope),name:C[scope].code+" — Fall 2026",file:C[scope].code.replace(/\s+/g,"-").toLowerCase()};
+  return {items:all,name:"Fall 2026 Coursework",file:"fall-2026-all"};
+}
+function wireICS(host){
+  host.querySelectorAll("[data-ics]").forEach(b=>{
+    b.onclick=()=>{ const s=icsScope(b.dataset.ics); downloadICS(s.items,s.name,s.file); };
+  });
+}
+
+/* ============================================================
+   7c. Transfer Plan — CODO into IBE first, then IBE + IE double
+   ============================================================ */
+
+const IBE_CODO_REQS = [
+  {id:"calc", code:"MA 16500", title:"Calculus I (B or better)", credits:4, programs:["ibe"], status:"inprogress", fall2026:true,
+   note:"In progress. Needs B or better. You're taking MA 16500; confirm with advisor that this satisfies the requirement (list also accepts MA 16100, 16200, 16600, 26100)."},
+  {id:"chem", code:"CHM 11510/11520", title:"General Chemistry (B or better)", credits:4, programs:["ibe"], status:"inprogress", fall2026:true,
+   note:"In progress. IBE requires CHM 11500 OR PHYS 17200 (B or better). CHM 11510 may count, but confirm — you might need PHYS 17200 instead."},
+  {id:"acct", code:"ACCT 20000", title:"Accounting (B or better)", credits:3, programs:["ibe"], status:"inprogress", fall2026:true,
+   note:"In progress. ACCT 20000 is the same course as the old MGMT 20000 (code was updated). This satisfies the requirement. ✓"},
+  {id:"econ", code:"ECON 25100", title:"Microeconomics (C- or better)", credits:3, programs:["ibe"], status:"done", fall2026:false,
+   note:"Done via AP. Needs C- or better (AP credit meets this)."},
+  {id:"oral", code:"SCLA 10200", title:"Oral Communication (C- or better)", credits:3, programs:["ibe"], status:"inprogress", fall2026:true,
+   note:"In progress. SCLA 10200 satisfies this. Alternatives: COM 11400, COM 21700, or EDPS 31500."},
+  {id:"written", code:"ENGL 10800", title:"Written Communication (C- or better)", credits:3, programs:["ibe"], status:"inprogress", fall2026:true,
+   note:"In progress. ENGL 10800 satisfies this. Alternatives: ENGL 10600, SCLA 10100, or HONR 19903."},
+  {id:"standing", code:"—", title:"Good academic standing", credits:0, programs:["ibe"], status:"todo",
+   note:"Not on academic notice. Should be automatic with a healthy GPA."},
+  {id:"gpa25", code:"—", title:"2.5+ cumulative GPA minimum", credits:0, programs:["ibe"], status:"todo",
+   note:"Floor to be eligible for CODO. Track this after each semester."},
+  {id:"gpa30courses", code:"—", title:"3.0+ cumulative GPA", credits:0, programs:["ibe"], status:"todo",
+   note:"The courses marked above (ECON, SCLA, ENGL) require a 3.0+ cumulative GPA to satisfy them. Track this closely."},
+  {id:"lettergrade", code:"—", title:"Letter grades on Purdue campus", credits:0, programs:["ibe"], status:"todo",
+   note:"Math, Chem, and Accounting must be letter grades taken on Purdue campus — not P/NP, not transfer credit."},
+  {id:"survey", code:"—", title:"Short answer survey", credits:0, programs:["ibe"], status:"todo",
+   note:"Due 5pm Thursday of finals week, the SEMESTER BEFORE you change majors. Targeting Spring 2027 CODO = due finals week Spring 2027."}
+];
+
+/* Each AP score only determines PASS/FAIL against Purdue's threshold for that tier —
+   the credit hours actually come from the Purdue course the score unlocks, not the score itself. */
+const CREDIT_HISTORY = [
+  { term:"High School — AP Credit", key:"hs", courses:[
+    {code:"ECON 25100", title:"Microeconomics", credits:3, kind:"requirement",
+     note:"AP Microeconomics, score 4 (passed the score-4 tier). Purdue course ECON 25100 is 3 credit hours. Direct match — satisfies IBE's ECON 25100 requirement outright."},
+    {code:"MA 15800", title:"Precalculus (undistributed placement)", credits:3, kind:"elective",
+     note:"AP Precalculus, score 5 (passed the score-4-and-up tier — there's no higher tier past 4 for this exam). Purdue course MA 15800 is 3 credit hours. This is Precalculus, not Calculus — doesn't replace MA 16500. Free elective credit."},
+    {code:"—", title:"Psychology — no credit", credits:0, kind:"none",
+     note:"AP Psychology, score 2. Below Purdue's pass threshold of 3 for any credit. 0 credit hours."},
+    {code:"STAT 1XXXX", title:"Statistics (undistributed)", credits:3, kind:"elective",
+     note:"AP Statistics, score 3 (passed the score-3 tier; a 4 would've unlocked STAT 30100 instead). Undistributed stat credit is 3 credit hours. Likely won't satisfy IBE's specific STAT 22500/30301 requirement — free elective."},
+    {code:"CS 1XXXX", title:"Computer Science (undistributed)", credits:3, kind:"elective",
+     note:"AP CS Principles, score 4 (passed the score-3 tier; a 5 would've unlocked CS 17700 instead). Undistributed CS credit is 3 credit hours. IBE doesn't require CS specifically — free elective."},
+    {code:"HIST 1XXXX", title:"History (undistributed)", credits:3, kind:"requirement",
+     note:"AP World History: Modern, score 3 (passed the score-3 tier; a 4 would've unlocked HIST 10500 instead). Undistributed history credit is 3 credit hours. Likely satisfies IBE's Human Cultures: Humanities Selective."}
+  ]},
+  { term:"Freshman Year — Fall 2026 (in progress)", key:"fall2026", courses:[
+    {code:"MA 16500", title:"Calculus I", credits:4, kind:"requirement", note:"In progress. Needs B or better for IBE CODO."},
+    {code:"CHM 11510", title:"General Chemistry I (lecture)", credits:3, kind:"requirement", note:"In progress. Needs B or better for IBE CODO."},
+    {code:"CHM 11520", title:"General Chemistry I Lab", credits:1, kind:"requirement", note:"In progress, pairs with CHM 11510."},
+    {code:"ACCT 20000", title:"Introductory Accounting", credits:3, kind:"requirement", note:"In progress. Same course as old MGMT 20000. Needs B or better for IBE CODO."},
+    {code:"SCLA 10200", title:"Transformative Texts II", credits:3, kind:"requirement", note:"In progress. Satisfies Oral Communication."},
+    {code:"ENGL 10800", title:"First-Year Composition", credits:3, kind:"requirement", note:"In progress. Satisfies Written Communication."}
+  ]}
+];
+
+function creditSummary(){
+  const byGroup = {};
+  CREDIT_HISTORY.forEach(g=>{ byGroup[g.key] = g.courses.reduce((s,c)=>s+c.credits,0); });
+  const total = Object.values(byGroup).reduce((s,v)=>s+v,0);
+  return { ap: byGroup.hs||0, fall: byGroup.fall2026||0, total };
+}
+
+function creditHistoryHTML(){
+  return CREDIT_HISTORY.map(g=>{
+    const subtotal = g.courses.reduce((s,c)=>s+c.credits,0);
+    return '<div style="margin-bottom:16px">'
+      + '<div style="display:flex;align-items:baseline;gap:8px;border-bottom:2px solid var(--ink);padding-bottom:4px;margin-bottom:6px">'
+        + '<h5 style="margin:0;font-family:var(--serif);font-size:15px;font-weight:600">'+esc(g.term)+'</h5>'
+        + '<span style="margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)">'+subtotal+' cr</span>'
+      + '</div>'
+      + g.courses.map(c=>{
+          const kindPill = c.kind==="requirement" ? '<span class="statuspill done">requirement</span>'
+            : c.kind==="elective" ? '<span class="statuspill inprogress">elective only</span>'
+            : '<span class="statuspill todo">no credit</span>';
+          return '<div class="reqrow">'
+            + '<span class="rc">'+esc(c.code)+'</span>'
+            + '<span class="rt"><b>'+esc(c.title)+(c.credits?' <span style="font-weight:400;color:var(--ink-3);font-size:11px">· '+c.credits+' cr</span>':'')+'</b>'
+            + '<div class="prog">'+kindPill+'</div>'
+            + '<p>'+esc(c.note)+'</p></span></div>';
+        }).join("")
+      + '</div>';
+  }).join("");
+}
+
+function creditBarHTML(programKey){
+  const p = CODO_PROGRAMS[programKey];
+  const need = parseInt(p.credits,10);
+  const have = creditSummary().total;
+  const pct = Math.min(100, Math.round(have/need*100));
+  return '<div class="progrow" style="grid-template-columns:150px 1fr 90px">'
+    + '<span>'+p.name+'</span>'
+    + '<span class="bar" style="--c:'+p.c+'"><i style="width:'+pct+'%"></i></span>'
+    + '<span class="pct">'+have+' / '+need+' cr</span></div>';
+}
+
+const IBE_CODO_TIMELINE = [
+  {date:"Sep 4, 2026", event:"Last day to drop without a record"},
+  {date:"Nov 24, 2026", event:"Last day to drop with a W"},
+  {date:"Dec 17, 2026 (Thu, 5pm)", event:"✱ SHORT ANSWER SURVEY DUE \u2014 submit now, for a SPRING 2027 CODO. IBE only requires 1 completed semester, not 2 \u2014 this is the semester that counts."},
+  {date:"Dec 14-19, 2026", event:"Fall 2026 finals week \u2014 your grades post (survey is submitted before this, reviewed after)"},
+  {date:"Late Dec 2026 / early Jan 2027", event:"Purdue reviews your CODO request using your just-posted Fall grades and GPA"},
+  {date:"Before Spring 2027 classes start", event:"Decision arrives by email. If approved \u2014 you're an IBE student starting Spring 2027."},
+  {date:"If not approved", event:"You stay in General Business, keep building GPA, and can reapply for Fall 2027 with a stronger transcript."}
+];
+
+const CODO_PROGRAMS = {
+  ibe: {
+    name:"IBE (single major)", c:"#0f766e",
+    credits:"120", semesters:"8 (standard 4-year map)",
+    gpa:"2.5 minimum to CODO, 3.0+ for specific courses.",
+    admit:"Holistic review on space-available basis. Very competitive.",
+    caveat:true
+  },
+  ibeie: {
+    name:"IBE + IE (double degree)", c:"#7c4ea8",
+    credits:"141", semesters:"9",
+    gpa:"3.00+ to add IE as second major (after you're in IBE).",
+    admit:"Once in IBE, you can petition to add IE. Requirements TBD per advisors.",
+    caveat:false
+  }
+};
+
+function codoStatus(id, fallback){ const e=edit("codo-"+id); return e.status || fallback; }
+
+function codoProgress(programKey){
+  const list = IBE_CODO_REQS.filter(r=>r.programs.includes(programKey) && r.credits>0);
+  const done = list.filter(r=>codoStatus(r.id,r.status)==="done").length;
+  return {done, total:list.length};
+}
+
+function programCardHTML(key){
+  const p=CODO_PROGRAMS[key], prog=codoProgress(key);
+  return '<article class="card cmpcard" style="--c:'+p.c+'">'
+    + '<span class="lbl">CODO target</span><h3>'+p.name+'</h3>'
+    + '<div class="big">'+p.credits+' <span style="font-size:14px;font-family:var(--sans);color:var(--ink-2);font-weight:400">credit hrs</span></div>'
+    + '<div class="lbl">'+p.semesters+'</div>'
+    + '<dl><dt>GPA to watch</dt><dd>'+esc(p.gpa)+'</dd>'
+    + '<dt>Admission notes</dt><dd>'+esc(p.admit)+'</dd></dl>'
+    + '<div style="margin-top:12px"><span class="statuspill inprogress">'+prog.done+' / '+prog.total+' course reqs done</span>'
+    + (p.caveat?' <span class="statuspill note">confirm w/ advisor</span>':'')
+    + '</div></article>';
+}
+
+function reqRowHTML(r){
+  const st=codoStatus(r.id, r.status);
+  const pillsForPrograms = r.programs.map(pk=>'<span class="statuspill" style="border:1px solid '+CODO_PROGRAMS[pk].c+'55;color:'+CODO_PROGRAMS[pk].c+';background:transparent">'+CODO_PROGRAMS[pk].name.split(" ")[0]+'</span>').join(" ");
+  return '<div class="reqrow arow" data-id="codo-'+r.id+'">'
+    + '<span class="rc">'+esc(r.code)+'</span>'
+    + '<span class="rt"><b>'+esc(r.title)+(r.credits?' <span style="font-weight:400;color:var(--ink-3);font-size:11px">· '+r.credits+' cr</span>':'')+'</b>'
+    + '<div class="prog">'+pillsForPrograms+'</div>'
+    + (r.note?'<p>'+esc(r.note)+'</p>':'')
+    + '</span>'
+    + '<select class="status" data-k="status" data-v="'+st+'">'
+      + [["done","✓ Done"],["inprogress","In progress"],["todo","Not started"]].map(o=>'<option value="'+o[0]+'"'+(o[0]===st?" selected":"")+'>'+o[1]+'</option>').join("")
+    + '</select></div>';
+}
+
+function buildTransfer(){
+  const host=document.getElementById("page-transfer");
+  const cs = creditSummary();
+  let h = '<p class="eyebrow">Two-phase plan: IBE first, then IBE+IE</p>'
+    + '<h2 class="section">General Business &rarr; IBE &rarr; IBE + IE</h2>'
+    + '<p class="section-note">Start by CODOing into IBE (single major). Once you are established in IBE, add IE as a second major. Everything here is a planning draft, confirm specifics with advisors before any official move.</p>';
+
+  h += '<div class="callout" style="background:#fdefe9;border-left-color:#e0562f"><b>Correction:</b> I previously said Fall 2027 was your realistic CODO target, that was wrong. IBE only requires <b>1 completed semester</b> (not 2, that is the double-degree rule). The short-answer survey is due Thursday of THIS Fall 2026 finals week, submitted before grades post and reviewed after. <b>Spring 2027 is realistically in play</b> if your Fall grades and GPA come in where they need to be.</div>';
+
+  h += '<div class="callout"><b>Where you are right now:</b> ECON 25100 is done via AP (direct match). ACCT 20000 counts (new code for MGMT 20000). MA 16500, CHM 11510/11520, SCLA 10200, and ENGL 10800 are all in progress and feed the CODO requirements. Still confirm whether CHM 11510 satisfies "CHM 11500 or PHYS 17200," and get the survey submitted by Dec 17.</div>';
+
+  h += '<h3 style="font-family:var(--serif);font-size:19px;margin:26px 0 4px">Your credits, by the numbers</h3>'
+    + '<p style="font-size:12px;color:var(--ink-3);margin:0 0 10px">An AP score only tells you whether you cleared Purdue\u2019s pass threshold for that exam \u2014 it isn\u2019t the credit hours itself. Each credit number below comes from the actual Purdue course your score unlocked.</p>'
+    + '<button class="card" id="toggleCreditHistory" style="padding:14px 16px;width:100%;text-align:left;cursor:pointer;border:1px solid var(--rule);font:inherit;display:block">'
+    + '<div class="statgrid" style="margin-bottom:16px">'
+      + stat(cs.ap,"AP credits confirmed")
+      + stat(cs.fall,"Fall 2026 in progress")
+      + stat(cs.total,"total once fall posts")
+    + '</div>'
+    + creditBarHTML("ibe") + creditBarHTML("ibeie")
+    + '<p style="margin:10px 0 0;font-size:11.5px;color:var(--ink-3)">Bars assume all Fall 2026 courses pass. Only Microeconomics (plus possibly World History) maps to actual IBE requirements, the rest (Precalc, Statistics, CS Principles) land as free elective credit, not requirement-fulfilling credit.</p>'
+    + '<p style="margin:12px 0 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-deep)">▾ Tap to see every class counted, by semester</p>'
+    + '</button>'
+    + '<div class="inner" id="creditHistoryBody" style="display:none;padding:14px 0 4px">' + creditHistoryHTML() + '</div>';
+
+
+  h += '<h3 style="font-family:var(--serif);font-size:19px;margin:30px 0 12px">Phase 1: CODO into IBE (single major)</h3>'
+    + '<div class="cmpgrid">' + programCardHTML("ibe") + '</div>';
+
+  h += '<h4 style="font-family:var(--serif);font-size:16px;margin:20px 0 8px">CODO eligibility checklist for IBE</h4>'
+    + '<p style="font-size:13px;color:var(--ink-2);margin:0 0 10px">Update status as you get grades. The progress count above auto-updates.</p>'
+    + '<div class="card" style="padding:6px 16px">' + IBE_CODO_REQS.map(reqRowHTML).join("") + '</div>';
+
+  h += '<h4 style="font-family:var(--serif);font-size:16px;margin:20px 0 8px">Corrected timeline, targeting Spring 2027</h4>'
+    + '<div class="card tablewrap"><table class="data"><tbody>'
+    + IBE_CODO_TIMELINE.map(t=>'<tr><td style="font-family:var(--mono);font-size:11px;color:var(--gold-deep);white-space:nowrap;width:170px">'+esc(t.date)+'</td><td><b>'+esc(t.event)+'</b></td></tr>').join("")
+    + '</tbody></table></div>';
+
+  h += '<h4 style="font-family:var(--serif);font-size:16px;margin:20px 0 8px">Only take classes that count toward IBE this semester onward</h4>'
+    + '<div class="card" style="padding:14px 16px">'
+    + '<p style="margin:0 0 10px">Good news, every course you are currently in already counts. For any remaining electives or add/drop decisions this fall, stick to courses that map directly onto IBE\u2019s list: an Engineering IBE Core Selective, a Business Method Selective, or general Human Cultures/Humanities credit (which your AP World History may have already covered).</p>'
+    + '<ul class="policy">'
+      + '<li>Do not add random gen-eds, check the IBE course list first so every new credit hour double-counts.</li>'
+      + '<li>If you have room for one more course, PHYS 17200 (Modern Mechanics) is worth taking now or in Spring, it is core to IBE and one of the two accepted options for your Chem/Physics requirement.</li>'
+      + '<li>Submit the short-answer survey by <b>Dec 17, 2026, 5pm</b> regardless of whether your Fall grades are final yet.</li>'
+    + '</ul></div>';
+
+  h += '<h4 style="font-family:var(--serif);font-size:16px;margin:20px 0 8px">If approved, Spring 2027 as an IBE student</h4>'
+    + '<div class="card" style="padding:14px 16px">'
+    + '<p style="margin:0">You would register for IBE-exclusive courses: ENGR 13300, IBE 29110 (or MGMT 11000), EPICS/VIP I, MA 16600, and PHYS 17200 if not already done. This lines up closely with IBE\u2019s own "Spring 1st Year" sample plan.</p>'
+    + '</div>';
+
+  h += '<hr style="border:0;border-top:2px solid var(--rule-strong);margin:32px 0">'
+    + '<h3 style="font-family:var(--serif);font-size:19px;margin:26px 0 12px">Phase 2: Add IE as a second major (optional)</h3>'
+    + '<p style="font-size:13px;color:var(--ink-2);margin:0 0 16px">Once you are in IBE and have a semester or two on record, you can petition to add Industrial Engineering, turning your degree into the 9-semester double. This section is a draft, <b>confirm timeline and requirements with an IE advisor.</b></p>'
+    + '<div class="cmpgrid">' + programCardHTML("ibeie") + '</div>'
+    + '<div class="callout" style="background:#f9d6e6;border-left-color:#b5427a"><b>To do once you are in IBE:</b> Meet with an IE advisor to confirm (1) when you can petition to add IE, (2) any GPA/course requirements beyond IBE\u2019s own, and (3) whether 9 semesters total is realistic from your position.</div>';
+
+  host.innerHTML = h;
+  wireRows(host);
+
+  const tch = document.getElementById("toggleCreditHistory");
+  if(tch) tch.onclick=()=>{
+    const body = document.getElementById("creditHistoryBody");
+    body.style.display = body.style.display==="none" ? "block" : "none";
+  };
+}
+
+/* ============================================================
+   8. Boot
+   ============================================================ */
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+
+function switchPage(p){
+  document.getElementById("page-command").hidden = p!=="command";
+  document.getElementById("page-tracker").hidden = p!=="tracker";
+  document.getElementById("page-transfer").hidden = p!=="transfer";
+  document.getElementById("nav-command").setAttribute("aria-selected",p==="command");
+  document.getElementById("nav-tracker").setAttribute("aria-selected",p==="tracker");
+  document.getElementById("nav-transfer").setAttribute("aria-selected",p==="transfer");
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+(async function init(){
+  await loadState();
+  const t=new Date();
+  document.getElementById("todayStamp").textContent = DOW[t.getDay()].slice(0,3)+" "+MON[t.getMonth()].slice(0,3)+" "+t.getDate();
+  buildCommand();
+  buildTabs();
+  setupToolbar();
+  renderTracker();
+  buildTransfer();
+  document.getElementById("nav-command").onclick=()=>switchPage("command");
+  document.getElementById("nav-tracker").onclick=()=>switchPage("tracker");
+  document.getElementById("nav-transfer").onclick=()=>switchPage("transfer");
+  setInterval(()=>{
+    if(!document.getElementById("page-command").hidden) buildCommand();
+    const g=document.getElementById("gridB"); if(g) renderGrid(g);
+  }, 60000);
+})();
+</script>
+</body>
+</html>
